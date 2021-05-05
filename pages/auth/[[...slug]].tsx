@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       maxWidth: theme.breakpoints.width("md"),
-      marginTop: theme.spacing(4),
+      marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
     },
     paper: {
@@ -189,8 +189,10 @@ export default function SignUpPage() {
                     <Lock />
                   </Avatar>
                   <Typography variant="caption" gutterBottom>
-                    <Link href="/auth/login">Login </Link>
-                    to SynCollab or Signup below
+                    <Link href="/auth/login" color="secondary">
+                      {"Login"}
+                    </Link>
+                    {" to SynCollab or Signup below"}
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -252,7 +254,6 @@ export default function SignUpPage() {
                         variant="outlined"
                         autoComplete="off"
                         fullWidth
-                        autoFocus
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -289,7 +290,6 @@ export default function SignUpPage() {
                         variant="outlined"
                         autoComplete="off"
                         fullWidth
-                        autoFocus
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -351,7 +351,9 @@ export default function SignUpPage() {
         ) : (
           <Alert severity="error">
             <AlertTitle>Signup Failed</AlertTitle>
-            Oops! some error has occured, please try again. Error Message:{" "}
+            Oops! some error has occured, please try again.
+            <br />
+            <strong>Error Message: </strong>
             {status.message}
           </Alert>
         )}

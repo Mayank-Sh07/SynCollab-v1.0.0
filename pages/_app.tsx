@@ -1,7 +1,7 @@
 import * as React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
-import ServerSideAuthListner from "@/supabase/authentication";
+import { UserContextProvider } from "@/supabase/authentication";
 import { supabase } from "@/supabase/index";
 import { ThemeProvider } from "@material-ui/core/styles";
 import { CacheProvider } from "@emotion/react";
@@ -30,13 +30,14 @@ export default function MyApp(props: AppProps) {
         <title>SynCollab</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <ServerSideAuthListner supabaseClient={supabase} />
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
+      <UserContextProvider supabaseClient={supabase}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </UserContextProvider>
     </CacheProvider>
   );
 }

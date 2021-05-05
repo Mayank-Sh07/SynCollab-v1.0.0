@@ -1,31 +1,47 @@
-import { useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/supabase/index";
-import { UserCredentials } from "@supabase/supabase-js";
+import { useUser } from "@/supabase/authentication";
+import { definitions } from "@/types/supabase";
+import { GetServerSideProps } from "next";
 import { useForm, Controller } from "react-hook-form";
-import clsx from "clsx";
-import Link from "@/components/Link";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import Loader from "@/components/Loader";
+import clsx from "clsx";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import NameIcon from "@material-ui/icons/PersonPin";
+import UsernameIcon from "@material-ui/icons/AlternateEmail";
 
-import EmailIcon from "@material-ui/icons/Email";
-import PasswordIcon from "@material-ui/icons/VpnKey";
-import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
+export const getServerSideProps: GetServerSideProps = async () => {
+  let { data: profiles } = await supabase.from("profiles").select("username");
+
+  const userNames: string[] =
+    profiles === null ? [""] : profiles?.map((profile) => profile.username);
+
+  return { props: { userNames } };
+};
+
+interface ProfileData {
+  fullName: string;
+  userName: string;
+}
+
+interface Props {
+  userNames: string[];
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      maxWidth: 640,
       marginTop: theme.spacing(6),
       marginBottom: theme.spacing(2),
     },
@@ -38,6 +54,10 @@ const useStyles = makeStyles((theme: Theme) =>
     centered: {
       textAlign: "center",
     },
+    flexCentered: {
+      display: "flex",
+      justifyContent: "center",
+    },
     sidePadded: {
       paddingLeft: theme.spacing(6),
       paddingRight: theme.spacing(6),
@@ -48,43 +68,53 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function LoginPage() {
+export default function WelcomePage(props: Props) {
   const classes = useStyles();
   const router = useRouter();
-  const [status, setStatus] = useState({ open: false, success: false });
-  const { control, handleSubmit, reset } = useForm({
+  const { userNames } = props;
+  const { user } = useUser();
+  const [status, setStatus] = React.useState({ open: false, success: false });
+  const { control, handleSubmit } = useForm({
     mode: "onChange",
-    defaultValues: { email: "", password: "" },
+    defaultValues: { fullName: "", userName: "" },
   });
 
-  const Login = async (data: UserCredentials): Promise<void> => {
-    console.log(data);
-    let { error } = await supabase.auth.signIn({
-      email: data.email,
-      password: data.password,
-    });
+  const updateProfile = async (data: ProfileData): Promise<void> => {
+    const { error } = await supabase
+      .from<definitions["profiles"]>("profiles")
+      .insert([
+        {
+          uid: user?.id,
+          email: user?.email,
+          username: data.userName,
+          full_name: data.fullName,
+          avatar_url: `https://icotar.com/initials/${data.fullName.charAt(
+            0
+          )}.png`,
+        },
+      ]);
     if (error) {
       console.log(error);
       setStatus({ open: true, success: false });
       return;
     }
+    setStatus({ open: true, success: true });
     router.push("/app");
   };
 
+  if (user === undefined) {
+    return <Loader isLocal={false} />;
+  }
+
   return (
-    <Container className={classes.container}>
+    <Container className={classes.container} maxWidth="sm">
       <Paper className={classes.paper} elevation={2}>
-        <Link href="/">
-          <IconButton color="secondary">
-            <BackIcon />
-          </IconButton>
-        </Link>
         <Typography
           variant="h3"
           className={clsx(classes.pageTitle, classes.centered)}
           gutterBottom
         >
-          Login
+          Welcome
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -92,35 +122,32 @@ export default function LoginPage() {
               className={clsx(classes.paper, classes.sidePadded)}
               elevation={0}
               component="form"
-              onSubmit={handleSubmit((data: UserCredentials) => Login(data))}
+              onSubmit={handleSubmit((data: ProfileData) =>
+                updateProfile(data)
+              )}
             >
-              <Grid container direction="column" spacing={2}>
-                <Grid item>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={12} md={6}>
                   <Controller
-                    name="email"
+                    name="fullName"
                     control={control}
                     defaultValue=""
                     rules={{
-                      required: "Email address required",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
+                      required: "Full name required",
                     }}
                     render={({
                       field: { onChange, value },
                       fieldState: { error },
                     }) => (
                       <TextField
-                        label="Email Address"
+                        label="Full Name"
                         variant="outlined"
-                        autoComplete="email"
                         fullWidth
                         autoFocus
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <EmailIcon />
+                              <NameIcon />
                             </InputAdornment>
                           ),
                         }}
@@ -132,35 +159,35 @@ export default function LoginPage() {
                     )}
                   />
                 </Grid>
-                <Grid item>
+                <Grid item xs={12} sm={12} md={6}>
                   <Controller
-                    name="password"
+                    name="userName"
                     control={control}
                     defaultValue=""
                     rules={{
-                      required: "Password required",
+                      required: "Username required",
                       minLength: {
-                        value: 8,
-                        message: "Must have 8 or more characters",
+                        value: 4,
+                        message: "Must have 4 or more characters",
                       },
+                      validate: (value) =>
+                        !userNames.includes(value) || "Username already taken",
                     }}
                     render={({
                       field: { onChange, value },
                       fieldState: { error },
                     }) => (
                       <TextField
-                        label="Password"
+                        label="Username"
                         variant="outlined"
-                        autoComplete="off"
                         fullWidth
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <PasswordIcon />
+                              <UsernameIcon />
                             </InputAdornment>
                           ),
                         }}
-                        type="password"
                         value={value}
                         onChange={onChange}
                         error={!!error}
@@ -169,17 +196,14 @@ export default function LoginPage() {
                     )}
                   />
                 </Grid>
-                <Grid item>
-                  <Typography variant="caption" gutterBottom>
-                    {"Don't have an account? "}
-                    <Link href="/auth/signup" color="secondary">
-                      {"Create one"}
-                    </Link>
-                  </Typography>
-                </Grid>
-                <Grid item className={classes.centered}>
-                  <Button variant="contained" color="secondary" type="submit">
-                    Log In
+                <Grid item className={classes.centered} xs={12}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    type="submit"
+                    fullWidth
+                  >
+                    Submit
                   </Button>
                 </Grid>
               </Grid>
@@ -191,22 +215,17 @@ export default function LoginPage() {
         open={status.open}
         autoHideDuration={5500}
         onClose={() => {
-          reset({ email: "", password: "" });
           setStatus({ open: false, success: false });
         }}
       >
         {!status.success ? (
           <Alert severity="error">
-            <AlertTitle>Login Failed</AlertTitle>
-            Invalid email or password. Don't have an account?{" "}
-            <Link color="secondary" href="/auth/sinup">
-              Create a new account.
-            </Link>
+            <AlertTitle>Oops!</AlertTitle>
+            SynCollab couldn't update your profile, Please try again.
           </Alert>
         ) : (
           <Alert severity="success">
-            <AlertTitle>Login Successful</AlertTitle>
-            Welcome Back!
+            <AlertTitle>Profile Updated!</AlertTitle>
           </Alert>
         )}
       </Snackbar>

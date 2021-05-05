@@ -5,6 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log("here");
   supabase.auth.api.setAuthCookie(req, res);
   return;
 }
