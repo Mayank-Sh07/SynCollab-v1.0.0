@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { supabase } from "@/supabase/index";
 import { UserCredentials } from "@supabase/supabase-js";
 import { useForm, Controller } from "react-hook-form";
@@ -23,7 +24,6 @@ import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 
 import AccountTree from "@material-ui/icons/AccountTree";
-import Lock from "@material-ui/icons/LockOutlined";
 import EmailIcon from "@material-ui/icons/Email";
 import PasswordIcon from "@material-ui/icons/VpnKey";
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
@@ -40,6 +40,11 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.only("xs")]: {
         padding: theme.spacing(1),
       },
+    },
+    image: {
+      display: "flex",
+      justifyContent: "center",
+      // transform: "translateY(-10px)",
     },
     centered: {
       textAlign: "center",
@@ -61,6 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
       transform: `translateY(-4px)`,
       fontWeight: 700,
       fontSize: 24,
+      color: theme.palette.text.secondary,
     },
     cardContent: {
       marginLeft: theme.spacing(8),
@@ -69,21 +75,36 @@ const useStyles = makeStyles((theme: Theme) =>
         margin: theme.spacing(0, 2),
       },
     },
-    formHeader: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: theme.spacing(2),
-    },
     avatar: {
-      height: 48,
-      width: 48,
-      marginBottom: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
+      color: theme.palette.secondary.dark,
+      backgroundColor: theme.palette.primary.dark,
     },
   })
 );
+
+const cards = [
+  {
+    icon: <AccountTree />,
+    title: "Card One",
+    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+  Similique quidem eius, quam aliquid optio sed labore natus
+  quisquam maiores placeat`,
+  },
+  {
+    icon: <AccountTree />,
+    title: "Card Two",
+    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+  Similique quidem eius, quam aliquid optio sed labore natus
+  quisquam maiores placeat`,
+  },
+  {
+    icon: <AccountTree />,
+    title: "Card Three",
+    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+  Similique quidem eius, quam aliquid optio sed labore natus
+  quisquam maiores placeat`,
+  },
+];
 
 export default function SignUpPage() {
   const classes = useStyles();
@@ -135,45 +156,19 @@ export default function SignUpPage() {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Paper className={classes.paper} elevation={0}>
-              <Card className={classes.card} elevation={0}>
-                <CardHeader
-                  avatar={<AccountTree />}
-                  title={"Title here"}
-                  titleTypographyProps={{ className: classes.cardTitle }}
-                  className={classes.cardHeader}
-                />
-                <div className={classes.cardContent}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Similique quidem eius, quam aliquid optio sed labore natus
-                  quisquam maiores placeat.
-                </div>
-              </Card>
-              <Card className={classes.card} elevation={0}>
-                <CardHeader
-                  avatar={<AccountTree />}
-                  title={"Title here"}
-                  titleTypographyProps={{ className: classes.cardTitle }}
-                  className={classes.cardHeader}
-                />
-                <div className={classes.cardContent}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Similique quidem eius, quam aliquid optio sed labore natus
-                  quisquam maiores placeat.
-                </div>
-              </Card>
-              <Card className={classes.card} elevation={0}>
-                <CardHeader
-                  avatar={<AccountTree />}
-                  title={"Title here"}
-                  titleTypographyProps={{ className: classes.cardTitle }}
-                  className={classes.cardHeader}
-                />
-                <div className={classes.cardContent}>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Similique quidem eius, quam aliquid optio sed labore natus
-                  quisquam maiores placeat.
-                </div>
-              </Card>
+              {cards.map((card) => (
+                <Card className={classes.card} elevation={0} id={card.title}>
+                  <CardHeader
+                    avatar={
+                      <Avatar className={classes.avatar}>{card.icon}</Avatar>
+                    }
+                    title={card.title}
+                    titleTypographyProps={{ className: classes.cardTitle }}
+                    className={classes.cardHeader}
+                  />
+                  <div className={classes.cardContent}>{card.description}</div>
+                </Card>
+              ))}
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -184,16 +179,10 @@ export default function SignUpPage() {
               onSubmit={handleSubmit((data: UserCredentials) => SignUp(data))}
             >
               <Grid container direction="column" spacing={2}>
-                <Grid item className={classes.formHeader}>
-                  <Avatar className={classes.avatar}>
-                    <Lock />
-                  </Avatar>
-                  <Typography variant="caption" gutterBottom>
-                    <Link href="/auth/login" color="secondary">
-                      {"Login"}
-                    </Link>
-                    {" to SynCollab or Signup below"}
-                  </Typography>
+                <Grid item>
+                  <Container maxWidth="sm" className={classes.image}>
+                    <Image src="/signup.svg" height={150} width={300} />
+                  </Container>
                 </Grid>
                 <Grid item>
                   <Controller
@@ -215,6 +204,7 @@ export default function SignUpPage() {
                         label="Email Address"
                         variant="outlined"
                         autoComplete="email"
+                        color="secondary"
                         fullWidth
                         autoFocus
                         InputProps={{
@@ -253,6 +243,7 @@ export default function SignUpPage() {
                         label="Password"
                         variant="outlined"
                         autoComplete="off"
+                        color="secondary"
                         fullWidth
                         InputProps={{
                           startAdornment: (
@@ -289,6 +280,7 @@ export default function SignUpPage() {
                         label="Confirm password"
                         variant="outlined"
                         autoComplete="off"
+                        color="secondary"
                         fullWidth
                         InputProps={{
                           startAdornment: (

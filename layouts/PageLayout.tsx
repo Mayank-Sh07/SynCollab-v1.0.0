@@ -1,23 +1,37 @@
 import React from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import { supabase } from "../supabase";
-import { definitions } from "@/types/supabase";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  fade,
+} from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import Box from "@material-ui/core/Box";
+import IconButton from "@material-ui/core/IconButton";
+import Hidden from "@material-ui/core/Hidden";
 import Slide from "@material-ui/core/Slide";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Box from "@material-ui/core/Box";
 import Link from "@/components/Link";
 
-import LogoIcon from "@material-ui/icons/AccountTreeOutlined";
+import HomeIcon from "@material-ui/icons/Home";
+import PricingIcon from "@material-ui/icons/Style";
+import AboutIcon from "@material-ui/icons/EmojiObjects";
+import LinkedIn from "@material-ui/icons/LinkedIn";
+import Instagram from "@material-ui/icons/Instagram";
+
+const UserAvatar = dynamic(() => import("@/components/UserAvatar"), {
+  ssr: false,
+});
 
 interface Props {
   window?: () => Window;
@@ -26,21 +40,46 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    menuButton: {
-      marginRight: theme.spacing(2),
+    root: {
+      backgroundColor: theme.palette.primary.dark,
+      minHeight: "100vh",
     },
-    title: {
+    appBar: {
+      backgroundColor: theme.palette.primary.dark,
+    },
+    toolBar: {
+      minHeight: 58,
+      paddingTop: theme.spacing(2),
+      [theme.breakpoints.only("xs")]: {
+        paddingRight: 0,
+      },
+    },
+    menuButton: {
+      marginRight: theme.spacing(1),
+      backgroundColor: fade(theme.palette.secondary.main, 0.125),
+    },
+    spacer: {
       flexGrow: 1,
     },
-    footer: {
-      borderTop: `1px solid ${theme.palette.divider}`,
-      marginTop: theme.spacing(8),
-      paddingTop: theme.spacing(3),
-      paddingBottom: theme.spacing(3),
+    tabSection: {
+      marginRight: theme.spacing(2),
+    },
+    tab: {
       [theme.breakpoints.up("sm")]: {
-        paddingTop: theme.spacing(6),
-        paddingBottom: theme.spacing(6),
+        minWidth: theme.spacing(8),
+        padding: 0,
       },
+    },
+    footer: {
+      marginTop: theme.spacing(6),
+      marginBottom: theme.spacing(8),
+    },
+    footerTitle: {
+      fontWeight: 700,
+      marginLeft: theme.spacing(1),
+    },
+    footerItem: {
+      marginRight: theme.spacing(2),
     },
     "@global": {
       ul: {
@@ -64,135 +103,140 @@ function HideOnScroll(props: Props): React.ReactElement {
   );
 }
 
-function Copyright(): React.ReactElement {
-  return (
-    <Typography variant="body2" color="textPrimary" align="center">
-      {"Copyright © "}
-      <Link color="textPrimary" href="/">
-        SynCollab
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 export default function PageLayout(props: Props) {
   const classes = useStyles();
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  let userProfile: definitions["profiles"] | undefined = undefined;
-  if (typeof window !== "undefined") {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
     //@ts-expect-error
-    userProfile = JSON.parse(localStorage.getItem("userProfile"));
-  }
-
-  const redirectToLogin = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    router.push("/auth/login");
+    if (event.target.innerHTML === "Home") {
+      router.push("/");
+      //@ts-expect-error
+    } else router.push(`/${event.target.innerHTML}`);
   };
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>): void => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = (event: React.MouseEvent<HTMLElement>): void => {
-    setAnchorEl(null);
-  };
-
-  const signOut = (event: React.MouseEvent<HTMLElement>): void => {
-    supabase.auth.signOut();
-    location.reload();
-  };
+  const handleTabClick = () => null;
 
   return (
     <React.Fragment>
       <CssBaseline />
       {/* Header */}
       <HideOnScroll {...props}>
-        <AppBar>
-          <Toolbar>
-            <LogoIcon style={{ marginRight: "4px" }} />
-            <Typography variant="h6" className={classes.title}>
-              SynCollab
-            </Typography>
-            {userProfile && (
-              <Avatar
-                alt={userProfile.username}
-                src={userProfile.avatar_url}
-                onClick={handleMenu}
-              />
-            )}
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              open={open}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={signOut}>signout</MenuItem>
-            </Menu>
-          </Toolbar>
+        <AppBar className={classes.appBar} elevation={0}>
+          <Container>
+            <Toolbar className={classes.toolBar}>
+              <Image src="/logo.svg" height={50} width={50} />
+              <div className={classes.spacer} />
+              <Hidden smUp>
+                <Link href="/">
+                  <IconButton className={classes.menuButton}>
+                    <HomeIcon />
+                  </IconButton>
+                </Link>
+                <Link href="/about">
+                  <IconButton className={classes.menuButton}>
+                    <AboutIcon />
+                  </IconButton>
+                </Link>
+                <Link href="/pricing">
+                  <IconButton className={classes.menuButton}>
+                    <PricingIcon />
+                  </IconButton>
+                </Link>
+              </Hidden>
+              <Hidden xsDown>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  className={classes.tabSection}
+                >
+                  <Tab
+                    label="Home"
+                    classes={{ root: classes.tab }}
+                    onClick={handleTabClick}
+                  />
+                  <Tab
+                    label="About"
+                    classes={{ root: classes.tab }}
+                    onClick={handleTabClick}
+                  />
+                  <Tab
+                    label="Pricing"
+                    classes={{ root: classes.tab }}
+                    onClick={handleTabClick}
+                  />
+                </Tabs>
+              </Hidden>
+              <UserAvatar />
+            </Toolbar>
+          </Container>
         </AppBar>
       </HideOnScroll>
-      <Toolbar />
-      {/* Page */}
-      <Container maxWidth={"md"} component="main">
+      <Toolbar className={classes.toolBar} />
+      <Container maxWidth={"md"} component="main" className={classes.root}>
         {props.children}
       </Container>
-      {/* Footer */}
       <Container maxWidth="md" component="footer" className={classes.footer}>
-        <Grid container spacing={4} justify="space-evenly">
-          {footers.map((footer) => (
-            <Grid item xs={6} sm={3} key={footer.title}>
-              <Typography variant="h6" color="secondary" gutterBottom>
-                {footer.title}
+        <Grid container justify="space-between">
+          <Grid item>
+            <Box display="flex">
+              <Image src="/logo.svg" height={36} width={36} />
+              <Typography variant="h6" className={classes.footerTitle}>
+                SynCollab
               </Typography>
-              <ul>
-                {footer.description.map((item) => (
-                  <li key={item}>
-                    <Link href="#" variant="subtitle1" color="textSecondary">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Grid>
-          ))}
+            </Box>
+          </Grid>
+          <Grid item style={{ alignSelf: "flex-end" }}>
+            <IconButton size={"small"} className={classes.footerItem}>
+              <LinkedIn />
+            </IconButton>
+            <IconButton size={"small"} className={classes.footerItem}>
+              <Instagram />
+            </IconButton>
+          </Grid>
         </Grid>
-        <Box mt={5}>
-          <Copyright />
-        </Box>
+        <Grid container justify="space-between">
+          <Grid item>
+            <Typography variant="caption" color="textSecondary">
+              Made by{" "}
+              <Link color="secondary" href="#">
+                {" Mayank. "}
+              </Link>
+              All Rights Reserved.
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="caption" color="textSecondary">
+              <Link
+                href="/"
+                color="textSecondary"
+                className={classes.footerItem}
+              >
+                {"Home"}
+              </Link>
+              <Link
+                href="/about"
+                color="textSecondary"
+                className={classes.footerItem}
+              >
+                {"About"}
+              </Link>
+              <Link
+                href="/pricing"
+                color="textSecondary"
+                className={classes.footerItem}
+              >
+                {"Pricing"}
+              </Link>
+              <Link href="/app" color="textSecondary">
+                {"Application"}
+              </Link>
+            </Typography>
+          </Grid>
+        </Grid>
       </Container>
     </React.Fragment>
   );
 }
-
-const footers = [
-  {
-    title: "Company",
-    description: ["Team", "History", "Contact us"],
-  },
-  {
-    title: "Features",
-    description: ["Cool stuff", "Random feature", "Team feature"],
-  },
-  {
-    title: "Resources",
-    description: ["Resource", "Resource name", "Final resource"],
-  },
-  {
-    title: "Legal",
-    description: ["Privacy policy", "Terms of use"],
-  },
-];

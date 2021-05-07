@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  let { data: organizations, error } = await supabase.rpc<Organization>(
+  let { data: organizations } = await supabase.rpc<Organization>(
     "get_user_orgs",
     {
       user_id: user.id,
@@ -122,6 +122,12 @@ async function fetchOganizations(userId: string) {
   );
   return organizations;
 }
+
+const setOrg = (e: React.SyntheticEvent, orgId: number, orgName: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("orgData", JSON.stringify({ orgId, orgName }));
+  }
+};
 
 function AppIndex(props: Props) {
   const classes = useStyles();
@@ -296,8 +302,15 @@ function AppIndex(props: Props) {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Link href="#" style={{ textDecoration: "none !important" }}>
-                    <Button size="small" color="secondary">
+                  <Link
+                    href={`/app/${org.id}/`}
+                    style={{ textDecoration: "none !important" }}
+                  >
+                    <Button
+                      size="small"
+                      color="secondary"
+                      onClick={(event) => setOrg(event, org.id, org.name)}
+                    >
                       Enter Organization
                     </Button>
                   </Link>
@@ -357,7 +370,6 @@ function AppIndex(props: Props) {
                         label="Organization name"
                         variant="outlined"
                         fullWidth
-                        autoFocus
                         size="small"
                         InputProps={{
                           startAdornment: (
@@ -391,7 +403,6 @@ function AppIndex(props: Props) {
                         multiline
                         rows={2}
                         fullWidth
-                        autoFocus
                         size="small"
                         value={value}
                         onChange={onChange}
@@ -456,7 +467,6 @@ function AppIndex(props: Props) {
                         label="Team code"
                         variant="outlined"
                         fullWidth
-                        autoFocus
                         size="small"
                         InputProps={{
                           startAdornment: (

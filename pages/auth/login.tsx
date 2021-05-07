@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { supabase } from "@/supabase/index";
 import { UserCredentials } from "@supabase/supabase-js";
@@ -28,6 +29,11 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 640,
       marginTop: theme.spacing(6),
       marginBottom: theme.spacing(2),
+    },
+    image: {
+      display: "flex",
+      justifyContent: "center",
+      transform: "translateY(-10px)",
     },
     paper: {
       padding: theme.spacing(2),
@@ -73,12 +79,15 @@ export default function LoginPage() {
 
   return (
     <Container className={classes.container}>
-      <Paper className={classes.paper} elevation={2}>
+      <Paper className={classes.paper} elevation={4}>
         <Link href="/">
           <IconButton color="secondary">
             <BackIcon />
           </IconButton>
         </Link>
+        <Container maxWidth="sm" className={classes.image}>
+          <Image src="/login.svg" height={200} width={200} />
+        </Container>
         <Typography
           variant="h3"
           className={clsx(classes.pageTitle, classes.centered)}
@@ -115,6 +124,7 @@ export default function LoginPage() {
                         label="Email Address"
                         variant="outlined"
                         autoComplete="email"
+                        color="secondary"
                         fullWidth
                         autoFocus
                         InputProps={{
@@ -152,6 +162,7 @@ export default function LoginPage() {
                         label="Password"
                         variant="outlined"
                         autoComplete="off"
+                        color="secondary"
                         fullWidth
                         InputProps={{
                           startAdornment: (
