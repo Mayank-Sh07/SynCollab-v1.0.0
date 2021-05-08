@@ -64,7 +64,6 @@ export default function LoginPage() {
   });
 
   const Login = async (data: UserCredentials): Promise<void> => {
-    console.log(data);
     let { error } = await supabase.auth.signIn({
       email: data.email,
       password: data.password,
@@ -202,6 +201,7 @@ export default function LoginPage() {
         open={status.open}
         autoHideDuration={5500}
         onClose={() => {
+          console.log("refreshed login");
           reset({ email: "", password: "" });
           setStatus({ open: false, success: false });
         }}

@@ -1,17 +1,10 @@
 // TypeScript Complete
-import { forwardRef, AnchorHTMLAttributes } from "react";
-import clsx from "clsx";
 import { useRouter } from "next/router";
-import NextLink, { LinkProps as NextLinkProps } from "next/link";
-import MuiLink, { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
-
-interface NextLinkComposedProps
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
-    Omit<NextLinkProps, "href" | "as"> {
-  to: NextLinkProps["href"];
-  linkAs?: NextLinkProps["as"];
-  href?: NextLinkProps["href"];
-}
+import { forwardRef } from "react";
+import { LinkProps, NextLinkComposedProps } from "@/types/local";
+import clsx from "clsx";
+import NextLink from "next/link";
+import MuiLink from "@material-ui/core/Link";
 
 export const NextLinkComposed = forwardRef<
   HTMLAnchorElement,
@@ -45,14 +38,6 @@ export const NextLinkComposed = forwardRef<
     </NextLink>
   );
 });
-
-export type LinkProps = {
-  activeClassName?: string;
-  as?: NextLinkProps["as"];
-  href: NextLinkProps["href"];
-  noLinkStyle?: boolean;
-} & Omit<NextLinkComposedProps, "to" | "linkAs" | "href"> &
-  Omit<MuiLinkProps, "href">;
 
 const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   props,

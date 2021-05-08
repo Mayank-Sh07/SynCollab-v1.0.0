@@ -1,11 +1,8 @@
 import React from "react";
+import { LoaderProps } from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
-
-interface Props {
-  isLocal: boolean;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Loader(props: Props) {
+function Loader(props: LoaderProps) {
   const classes = useStyles();
   const { isLocal } = props;
 

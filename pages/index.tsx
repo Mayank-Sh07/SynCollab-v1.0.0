@@ -1,7 +1,9 @@
 import React from "react";
-import dynamic from "next/dynamic";
+import PageLayout from "@/layouts/PageLayout";
 import Image from "next/image";
 import Link from "@/components/Link";
+import { HomePageFeatures } from "@/utils/content";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
@@ -11,14 +13,7 @@ import Typography from "@material-ui/core/Typography";
 
 import StartIcon from "@material-ui/icons/NextWeek";
 import GithubIcon from "@material-ui/icons/GitHub";
-import FeatureIcon from "@material-ui/icons/Star";
 import SignupIcon from "@material-ui/icons/PersonAdd";
-
-const PageLayout = dynamic(() => import("@/layouts/PageLayout"), {
-  ssr: false,
-});
-
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,11 +42,11 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonBox: {
       display: "flex",
       justifyContent: "center",
-      "& > *": {
-        margin: theme.spacing(1),
-        borderRadius: 2,
-        padding: theme.spacing(1, 3),
-      },
+    },
+    ctaBtn: {
+      margin: theme.spacing(1),
+      borderRadius: 2,
+      padding: theme.spacing(1, 3),
     },
     cardContainer: {
       marginTop: theme.spacing(8),
@@ -82,51 +77,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const features = [
-  {
-    icon: <FeatureIcon />,
-    title: "Feature1",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea repellendus aspernatur expedita asperiores modi omnis, quos quis error saepe fugiat?",
-  },
-  {
-    icon: <FeatureIcon />,
-    title: "Feature2",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea repellendus aspernatur expedita asperiores modi omnis, quos quis error saepe fugiat?",
-  },
-  {
-    icon: <FeatureIcon />,
-    title: "Feature3",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea repellendus aspernatur expedita asperiores modi omnis, quos quis error saepe fugiat?",
-  },
-];
-
 function Index() {
-  // React.useEffect(() => {
-  //   async function getData() {
-  //     let { data: userNames, error } = await supabase
-  //       .from("profiles")
-  //       .select("username");
-
-  //     console.log(
-  //       "userNames: ",
-  //       userNames?.map((row) => row.username)
-  //     );
-  //     if (error) return error;
-  //     else return userNames;
-  //   }
-
-  //   const data = getData();
-  //   console.log(data);
-  // }, []);
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <Container maxWidth="sm" className={classes.flexCenter}>
-        <Image src="/teams.svg" height={400} width={400} />
+        <Image src="/teams.svg" height={420} width={480} />
       </Container>
       <Typography
         variant="h3"
@@ -144,17 +101,29 @@ function Index() {
         </Typography>
       </Container>
       <Box mt={4} className={classes.buttonBox}>
-        <Button variant="contained" color="secondary" startIcon={<StartIcon />}>
-          Get Started
-        </Button>
-        <Button variant="contained" color="primary" startIcon={<GithubIcon />}>
+        <Link href="/app">
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<StartIcon />}
+            className={classes.ctaBtn}
+          >
+            Get Started
+          </Button>
+        </Link>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<GithubIcon />}
+          className={classes.ctaBtn}
+        >
           Github
         </Button>
       </Box>
       <Container className={classes.cardContainer}>
         <Grid container justify="space-evenly" spacing={4}>
-          {features.map((feature) => (
-            <Grid item xs={12} sm={4} id={feature.title}>
+          {HomePageFeatures.map((feature) => (
+            <Grid item xs={12} sm={4} id={feature.title} key={feature.title}>
               <Box className={classes.featureCard}>
                 <Avatar className={classes.featureAvatar}>
                   {feature.icon}
@@ -199,3 +168,21 @@ function Index() {
 Index.layout = PageLayout;
 
 export default Index;
+
+// React.useEffect(() => {
+//   async function getData() {
+//     let { data: userNames, error } = await supabase
+//       .from("profiles")
+//       .select("username");
+
+//     console.log(
+//       "userNames: ",
+//       userNames?.map((row) => row.username)
+//     );
+//     if (error) return error;
+//     else return userNames;
+//   }
+
+//   const data = getData();
+//   console.log(data);
+// }, []);

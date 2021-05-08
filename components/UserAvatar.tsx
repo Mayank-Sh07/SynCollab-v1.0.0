@@ -1,6 +1,6 @@
 import React from "react";
 import { supabase } from "../supabase";
-import { definitions } from "@/types/supabase";
+import { definitions } from "@/types/local";
 import { useRouter } from "next/router";
 import { useUser } from "@/supabase/authentication";
 import {
@@ -17,6 +17,7 @@ import Hidden from "@material-ui/core/Hidden";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 import LoginIcon from "@material-ui/icons/AccountCircle";
@@ -90,11 +91,13 @@ export default function UserAvatar() {
 
   return (
     <>
-      <Avatar
-        alt={userProfile?.username}
-        src={userProfile?.avatar_url}
-        onClick={handleMenu}
-      />
+      <Tooltip title={userProfile.username + " | " + user.email}>
+        <Avatar
+          alt={userProfile?.username}
+          src={userProfile?.avatar_url}
+          onClick={handleMenu}
+        />
+      </Tooltip>
       <Menu
         id="menu-appbar"
         anchorEl={anchorEl}

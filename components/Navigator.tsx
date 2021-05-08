@@ -1,7 +1,6 @@
 import React from "react";
-import { supabase } from "@/supabase/index";
-import { User } from "@supabase/supabase-js";
-import { Org } from "@/types/local";
+import { Org, User, Nav, NavigatorData } from "@/types/local";
+import { getNavData } from "@/utils/functions";
 import clsx from "clsx";
 import useSWR from "swr";
 import {
@@ -76,27 +75,25 @@ interface NavigatorProps
   user: User;
 }
 
-interface Team {
-  id: string;
-  name: string;
-  date: Date;
-}
-
-const getNavData = async (orgId: string, userId: string) => {
-  let { data: teams } = await supabase.rpc<Team>("get_user_org_teams", {
-    user_id: userId,
-    org_id: orgId,
-  });
-  return teams;
-};
-
 function Navigator(props: NavigatorProps) {
-  const { classes, orgId, orgName, user, ...other } = props;
-  const baseOrgURL = `/app/${orgId}/`;
   const [selectedItem, setSelectedItem] = React.useState("About");
+  const { classes, orgId, orgName, user, ...other } = props;
   const { data } = useSWR([orgId, user.id], getNavData);
-
-  const categories = [
+  const baseOrgURL = `/app/${orgId}/`;
+  let userTeams: Nav[] = !!data
+    ? data.map((team) => ({
+        id: team.name,
+        icon: <DnsRoundedIcon />,
+        href: baseOrgURL + encodeURIComponent(team.id),
+      }))
+    : [
+        {
+          id: "No Teams",
+          icon: <DnsRoundedIcon />,
+          href: baseOrgURL,
+        },
+      ];
+  const categories: NavigatorData[] = [
     {
       id: orgName,
       children: [
@@ -115,18 +112,11 @@ function Navigator(props: NavigatorProps) {
     },
     {
       id: "Your Teams",
-      children: data?.map((team) => ({
-        id: team.name,
-        icon: <DnsRoundedIcon />,
-        href: baseOrgURL + encodeURIComponent(team.id),
-      })),
+      children: userTeams,
     },
   ];
 
-  const handleListItemClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    id: string
-  ) => {
+  const handleListItemClick = (id: string) => {
     setSelectedItem(id);
   };
 
@@ -175,7 +165,7 @@ function Navigator(props: NavigatorProps) {
                   classes={{ selected: classes.itemActiveItem }}
                   className={clsx(classes.item)}
                   selected={selectedItem === childId}
-                  onClick={(event) => handleListItemClick(event, childId)}
+                  onClick={() => handleListItemClick(childId)}
                 >
                   <ListItemIcon className={classes.itemIcon}>
                     {icon}

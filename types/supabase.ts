@@ -24,6 +24,8 @@ export interface paths {
           role?: parameters["rowFilter.notifications.role"];
           body?: parameters["rowFilter.notifications.body"];
           date_created?: parameters["rowFilter.notifications.date_created"];
+          status?: parameters["rowFilter.notifications.status"];
+          type?: parameters["rowFilter.notifications.type"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -82,6 +84,8 @@ export interface paths {
           role?: parameters["rowFilter.notifications.role"];
           body?: parameters["rowFilter.notifications.body"];
           date_created?: parameters["rowFilter.notifications.date_created"];
+          status?: parameters["rowFilter.notifications.status"];
+          type?: parameters["rowFilter.notifications.type"];
         };
         header: {
           /** Preference */
@@ -104,6 +108,8 @@ export interface paths {
           role?: parameters["rowFilter.notifications.role"];
           body?: parameters["rowFilter.notifications.body"];
           date_created?: parameters["rowFilter.notifications.date_created"];
+          status?: parameters["rowFilter.notifications.status"];
+          type?: parameters["rowFilter.notifications.type"];
         };
         body: {
           /** notifications */
@@ -519,6 +525,45 @@ export interface paths {
       };
     };
   };
+  "/rpc/get_user_orgs": {
+    post: {
+      parameters: {
+        body: {
+          args: {
+            user_id: string;
+          };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
+  "/rpc/get_user_org_teams": {
+    post: {
+      parameters: {
+        body: {
+          args: {
+            org_id: number;
+            user_id: string;
+          };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
   "/rpc/handle_new_org": {
     post: {
       parameters: {
@@ -536,11 +581,30 @@ export interface paths {
       };
     };
   };
-  "/rpc/handle_notification_accept": {
+  "/rpc/handle_notification_action": {
     post: {
       parameters: {
         body: {
           args: { [key: string]: any };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
+  "/rpc/delete_notification": {
+    post: {
+      parameters: {
+        body: {
+          args: {
+            notification_id: number;
+          };
         };
         header: {
           /** Preference */
@@ -585,6 +649,8 @@ export interface definitions {
     role?: "Manager" | "Member" | "Observer";
     body: string;
     date_created: string;
+    status: "PENDING" | "ACCEPTED" | "DECLINED";
+    type: "REQ_TO_JOIN" | "REQ_TO_ADD" | "INFO";
   };
   organizations: {
     /**
@@ -684,6 +750,8 @@ export interface parameters {
   "rowFilter.notifications.role": string;
   "rowFilter.notifications.body": string;
   "rowFilter.notifications.date_created": string;
+  "rowFilter.notifications.status": string;
+  "rowFilter.notifications.type": string;
   /** organizations */
   "body.organizations": definitions["organizations"];
   "rowFilter.organizations.oid": string;

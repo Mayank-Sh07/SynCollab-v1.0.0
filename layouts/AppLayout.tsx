@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Paperbase() {
+function AppLayout() {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { user } = useUser();
@@ -83,6 +83,7 @@ function Paperbase() {
       </nav>
       <div className={classes.app}>
         <Header
+          user={user}
           orgId={orgData.orgId}
           orgName={orgData.orgName}
           onDrawerToggle={handleDrawerToggle}
@@ -96,4 +97,4 @@ function Paperbase() {
   );
 }
 
-export default Paperbase;
+export default AppLayout;

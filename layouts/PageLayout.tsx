@@ -2,6 +2,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { PageLayoutProps } from "@/types/local";
 import {
   createStyles,
   makeStyles,
@@ -32,11 +33,6 @@ import Instagram from "@material-ui/icons/Instagram";
 const UserAvatar = dynamic(() => import("@/components/UserAvatar"), {
   ssr: false,
 });
-
-interface Props {
-  window?: () => Window;
-  children: React.ReactElement;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -91,7 +87,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function HideOnScroll(props: Props): React.ReactElement {
+function HideOnScroll(props: PageLayoutProps): React.ReactElement {
   const { children, window } = props;
   const trigger: boolean = useScrollTrigger({
     target: window ? window() : undefined,
@@ -103,21 +99,16 @@ function HideOnScroll(props: Props): React.ReactElement {
   );
 }
 
-export default function PageLayout(props: Props) {
+export default function PageLayout(props: PageLayoutProps) {
   const classes = useStyles();
   const router = useRouter();
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
-    //@ts-expect-error
-    if (event.target.innerHTML === "Home") {
-      router.push("/");
-      //@ts-expect-error
-    } else router.push(`/${event.target.innerHTML}`);
   };
 
-  const handleTabClick = () => null;
+  const handleTabClick = (path: string) => router.push(path);
 
   return (
     <React.Fragment>
@@ -155,17 +146,17 @@ export default function PageLayout(props: Props) {
                   <Tab
                     label="Home"
                     classes={{ root: classes.tab }}
-                    onClick={handleTabClick}
+                    onClick={() => handleTabClick("/")}
                   />
                   <Tab
                     label="About"
                     classes={{ root: classes.tab }}
-                    onClick={handleTabClick}
+                    onClick={() => handleTabClick("/about")}
                   />
                   <Tab
                     label="Pricing"
                     classes={{ root: classes.tab }}
-                    onClick={handleTabClick}
+                    onClick={() => handleTabClick("/pricing")}
                   />
                 </Tabs>
               </Hidden>

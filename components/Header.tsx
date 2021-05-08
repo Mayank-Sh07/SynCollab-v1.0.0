@@ -1,6 +1,8 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { Org } from "@/types/local";
+import useSWR from "swr";
+import { Org, User } from "@/types/local";
+import { getNotificationCount } from "@/utils/functions";
 import {
   createStyles,
   Theme,
@@ -14,6 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
+import Badge from "@material-ui/core/Badge";
 
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -51,10 +54,13 @@ const styles = (theme: Theme) =>
 
 interface HeaderProps extends WithStyles<typeof styles>, Org {
   onDrawerToggle: () => void;
+  user: User;
 }
 
 function Header(props: HeaderProps) {
-  const { classes, onDrawerToggle, orgId } = props;
+  const { classes, onDrawerToggle, orgId, user } = props;
+  const { data: notificationCount } = useSWR(user.id, getNotificationCount);
+  const n: number = notificationCount === undefined ? 0 : notificationCount;
   const baseOrgURL = `/app/${orgId}/`;
 
   return (
@@ -76,10 +82,14 @@ function Header(props: HeaderProps) {
             </Hidden>
             <Grid item xs />
             <Grid item>
-              <Tooltip title="Alerts • No alerts">
+              <Tooltip
+                title={n === 0 ? "Alerts • No alerts" : `Alerts • ${n} alerts`}
+              >
                 <Link href={baseOrgURL + "notifications"}>
                   <IconButton className={classes.menuButton}>
-                    <NotificationsIcon />
+                    <Badge badgeContent={n} color="secondary">
+                      <NotificationsIcon />
+                    </Badge>
                   </IconButton>
                 </Link>
               </Tooltip>

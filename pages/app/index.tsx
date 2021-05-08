@@ -1,12 +1,19 @@
 import React from "react";
+import Image from "next/image";
 import Link from "@/components/Link";
+import PageLayout from "@/layouts/PageLayout";
+import useSWR from "swr";
 import { GetServerSideProps } from "next";
 import { supabase } from "@/supabase/index";
-import { definitions } from "@/types/supabase";
-import { User } from "@supabase/supabase-js";
 import { useForm, Controller } from "react-hook-form";
-import useSWR from "swr";
-
+import { fetchOganizations, setOrg } from "@/utils/functions";
+import {
+  definitions,
+  Organization,
+  TeamCode,
+  AppProps,
+  OrgData,
+} from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
@@ -25,28 +32,6 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 
 import NameIcon from "@material-ui/icons/ShortText";
 import CodeIcon from "@material-ui/icons/LinearScale";
-
-interface Organization {
-  id: number;
-  name: string;
-  about: string;
-  date: Date;
-}
-
-interface Props {
-  organizations: Organization[] | null;
-  user: User;
-  userProfile: definitions["profiles"];
-}
-
-interface OrgData {
-  orgName: string;
-  orgDesc: string;
-}
-
-interface TeamCode {
-  teamCode: string;
-}
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { user } = await supabase.auth.api.getUserByCookie(req);
@@ -95,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
     },
     gridContainer: {
-      marginTop: theme.spacing(2),
+      marginTop: theme.spacing(1),
       marginBottom: theme.spacing(2),
     },
     card: {
@@ -103,8 +88,11 @@ const useStyles = makeStyles((theme: Theme) =>
       border: `1px solid`,
     },
     actionCard: {
-      minWidth: 275,
-      border: `1px solid`,
+      border: `1px solid ${theme.palette.primary.light}`,
+      minHeight: 680,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
       padding: theme.spacing(2),
       [theme.breakpoints.down("xs")]: {
         padding: theme.spacing(1),
@@ -113,23 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-async function fetchOganizations(userId: string) {
-  let { data: organizations } = await supabase.rpc<Organization>(
-    "get_user_orgs",
-    {
-      user_id: userId,
-    }
-  );
-  return organizations;
-}
-
-const setOrg = (e: React.SyntheticEvent, orgId: number, orgName: string) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("orgData", JSON.stringify({ orgId, orgName }));
-  }
-};
-
-function AppIndex(props: Props) {
+function AppIndex(props: AppProps) {
   const classes = useStyles();
   const [status, setStatus] = React.useState({
     open: false,
@@ -251,6 +223,8 @@ function AppIndex(props: Props) {
             tid: data.teamCode,
             oid: teams[0].oid,
             body: message,
+            type: "REQ_TO_JOIN",
+            status: "PENDING",
           },
         ],
         { returning: "minimal" }
@@ -275,12 +249,28 @@ function AppIndex(props: Props) {
     mutate();
   };
 
+  console.log(organizations);
+
   return (
     <Container maxWidth={"md"} className={classes.container}>
       <Paper elevation={0} className={classes.paper}>
         <Typography variant="h3" className={classes.pageTitle} gutterBottom>
           Organizations
         </Typography>
+        {Boolean(
+          organizations === null ||
+            organizations === undefined ||
+            organizations?.length === 0
+        ) && (
+          <>
+            <Box display="flex" justifyContent="center" mb={2} mt={8}>
+              <Image src="/organizations.svg" height={280} width={400} />
+            </Box>
+            <Typography variant="body1" color="textSecondary" align="center">
+              You have no existing Organizations
+            </Typography>
+          </>
+        )}
         <Grid
           container
           spacing={4}
@@ -331,18 +321,21 @@ function AppIndex(props: Props) {
             <Card
               elevation={2}
               component="form"
+              className={classes.actionCard}
               onSubmit={handleNewOrg((data: OrgData) => createNeworg(data))}
             >
               <CardContent>
+                <Box display="flex" justifyContent="center">
+                  <Image src="/neworg.svg" height={200} width={200} />
+                </Box>
                 <Typography
                   variant="h5"
                   component="h2"
                   gutterBottom
                   align="center"
+                  color="secondary"
                 >
-                  <b>
-                    <u>Create an Organization</u>
-                  </b>
+                  <b>Create an Organization</b>
                 </Typography>
                 <Typography
                   variant="body2"
@@ -369,6 +362,7 @@ function AppIndex(props: Props) {
                       <TextField
                         label="Organization name"
                         variant="outlined"
+                        color="secondary"
                         fullWidth
                         size="small"
                         InputProps={{
@@ -400,6 +394,7 @@ function AppIndex(props: Props) {
                       <TextField
                         label="Organization description"
                         variant="filled"
+                        color="secondary"
                         multiline
                         rows={2}
                         fullWidth
@@ -425,17 +420,20 @@ function AppIndex(props: Props) {
               elevation={2}
               component="form"
               onSubmit={handleTeamJoin((data: TeamCode) => joinTeam(data))}
+              className={classes.actionCard}
             >
               <CardContent>
+                <Box display="flex" justifyContent="center" mb={2}>
+                  <Image src="/jointeam.svg" height={200} width={200} />
+                </Box>
                 <Typography
                   variant="h5"
                   component="h2"
                   gutterBottom
                   align="center"
+                  color="secondary"
                 >
-                  <b>
-                    <u>Join an existing Team</u>
-                  </b>
+                  <b>Join an existing Team</b>
                 </Typography>
                 <Typography
                   variant="body2"
@@ -466,6 +464,7 @@ function AppIndex(props: Props) {
                       <TextField
                         label="Team code"
                         variant="outlined"
+                        color="secondary"
                         fullWidth
                         size="small"
                         InputProps={{
@@ -518,5 +517,7 @@ function AppIndex(props: Props) {
     </Container>
   );
 }
+
+AppIndex.layout = PageLayout;
 
 export default AppIndex;

@@ -5,6 +5,7 @@ let SyncollabTheme = createMuiTheme({
   palette: {
     type: "dark",
     primary: {
+      light: "#25282c",
       main: "#232f3e",
       dark: "#151719",
     },
