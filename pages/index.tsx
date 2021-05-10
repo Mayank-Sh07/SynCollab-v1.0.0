@@ -1,39 +1,28 @@
 import React from "react";
+// Components
 import PageLayout from "@/layouts/PageLayout";
-import Image from "next/image";
 import Link from "@/components/Link";
+import Image from "@/components/Image";
+import BoxTypography from "@/components/BoxTypography";
+import FeatureCard from "@/components/FeatureCard";
+import PlanBox from "@/components/PlanBox";
+// Types and Content
+import { title1, subtitle1 } from "@/types/local";
 import { HomePageFeatures } from "@/utils/content";
+// Material-UI Core
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import Avatar from "@material-ui/core/Avatar";
-import Typography from "@material-ui/core/Typography";
-
+// Material-UI Icons
 import StartIcon from "@material-ui/icons/NextWeek";
 import GithubIcon from "@material-ui/icons/GitHub";
-import SignupIcon from "@material-ui/icons/PersonAdd";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       backgroundColor: theme.palette.primary.dark,
       minHeight: "100vh",
-    },
-    flexCenter: {
-      display: "flex",
-      justifyContent: "center",
-    },
-    heroTitle: {
-      fontWeight: 700,
-      marginBottom: theme.spacing(3),
-      letterSpacing: -2,
-      [theme.breakpoints.only("xs")]: {
-        marginBottom: theme.spacing(2),
-        letterSpacing: -1,
-        padding: theme.spacing(2),
-      },
     },
     secondaryColor: {
       color: theme.palette.secondary.main,
@@ -42,8 +31,9 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonBox: {
       display: "flex",
       justifyContent: "center",
+      marginTop: theme.spacing(4),
     },
-    ctaBtn: {
+    callToAction: {
       margin: theme.spacing(1),
       borderRadius: 2,
       padding: theme.spacing(1, 3),
@@ -51,28 +41,6 @@ const useStyles = makeStyles((theme: Theme) =>
     cardContainer: {
       marginTop: theme.spacing(8),
       marginBottom: theme.spacing(6),
-    },
-    featureCard: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      textAlign: "center",
-      margin: "auto",
-      minWidth: 240,
-      maxWidth: 275,
-    },
-    featureAvatar: {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white,
-      marginBottom: theme.spacing(1),
-      height: 64,
-      width: 64,
-    },
-    signupBoxContainer: {
-      backgroundColor: theme.palette.secondary.main,
-      padding: theme.spacing(6),
-      borderRadius: 2,
-      marginTop: theme.spacing(3),
     },
   })
 );
@@ -82,31 +50,22 @@ function Index() {
 
   return (
     <div className={classes.root}>
-      <Container maxWidth="sm" className={classes.flexCenter}>
-        <Image src="/teams.svg" height={420} width={480} />
-      </Container>
-      <Typography
-        variant="h3"
-        component="h3"
-        align="center"
-        className={classes.heroTitle}
-      >
+      <Image src="/teams.svg" height={420} width={480} />
+      <BoxTypography {...title1}>
         Build Collaborative Teams with
         <strong className={classes.secondaryColor}> SynCollab</strong>
-      </Typography>
-      <Container maxWidth="sm">
-        <Typography align="center" color="textSecondary">
-          A platform for building strong, transparent and collaborative teams by
-          setting Objectives and tracking progress via measurable Key Results.
-        </Typography>
-      </Container>
-      <Box mt={4} className={classes.buttonBox}>
+      </BoxTypography>
+      <BoxTypography {...subtitle1} maxWidth={768} m={"auto"}>
+        A platform for building strong, transparent and collaborative teams by
+        setting Objectives and tracking progress via measurable Key Results.
+      </BoxTypography>
+      <div className={classes.buttonBox}>
         <Link href="/app">
           <Button
             variant="contained"
             color="secondary"
             startIcon={<StartIcon />}
-            className={classes.ctaBtn}
+            className={classes.callToAction}
           >
             Get Started
           </Button>
@@ -115,52 +74,19 @@ function Index() {
           variant="contained"
           color="primary"
           startIcon={<GithubIcon />}
-          className={classes.ctaBtn}
+          className={classes.callToAction}
         >
           Github
         </Button>
-      </Box>
+      </div>
       <Container className={classes.cardContainer}>
         <Grid container justify="space-evenly" spacing={4}>
           {HomePageFeatures.map((feature) => (
-            <Grid item xs={12} sm={4} id={feature.title} key={feature.title}>
-              <Box className={classes.featureCard}>
-                <Avatar className={classes.featureAvatar}>
-                  {feature.icon}
-                </Avatar>
-                <Typography variant="h6">
-                  <strong>{feature.title}</strong>
-                </Typography>
-                <Typography
-                  color="textSecondary"
-                  variant="subtitle2"
-                  align="justify"
-                >
-                  {feature.description}
-                </Typography>
-              </Box>
-            </Grid>
+            <FeatureCard {...feature} />
           ))}
         </Grid>
       </Container>
-      <Grid
-        container
-        justify="space-between"
-        className={classes.signupBoxContainer}
-      >
-        <Grid item>
-          <Typography variant="h5" component="h2">
-            <strong>Don't miss out on SynCollab!</strong>
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Link href="/auth/signup">
-            <Button variant="contained" startIcon={<SignupIcon />}>
-              SIGN ME UP
-            </Button>
-          </Link>
-        </Grid>
-      </Grid>
+      <PlanBox />
     </div>
   );
 }

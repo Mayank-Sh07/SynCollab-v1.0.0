@@ -6,13 +6,13 @@ import useSWR from "swr";
 import { GetServerSideProps } from "next";
 import { supabase } from "@/supabase/index";
 import { useForm, Controller } from "react-hook-form";
-import { fetchOganizations, setOrg } from "@/utils/functions";
+import { fetchOganizations, setOrg, truncate } from "@/utils/functions";
 import {
   definitions,
-  Organization,
+  UserOrganization,
   TeamCode,
-  AppProps,
-  OrgData,
+  AppIndexProps,
+  NewOrgData,
 } from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  let { data: organizations } = await supabase.rpc<Organization>(
+  let { data: organizations } = await supabase.rpc<UserOrganization>(
     "get_user_orgs",
     {
       user_id: user.id,
@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function AppIndex(props: AppProps) {
+function AppIndex(props: AppIndexProps) {
   const classes = useStyles();
   const [status, setStatus] = React.useState({
     open: false,
@@ -130,7 +130,7 @@ function AppIndex(props: AppProps) {
     defaultValues: { teamCode: "" },
   });
 
-  const createNeworg = async (data: OrgData) => {
+  const createNeworg = async (data: NewOrgData) => {
     const { error } = await supabase
       .from<definitions["organizations"]>("organizations")
       .insert(
@@ -288,7 +288,7 @@ function AppIndex(props: AppProps) {
                     <strong>{org.date}</strong>
                   </Typography>
                   <Typography variant="body2" component="p">
-                    {org.about}
+                    {truncate(org.about, 75, "...")}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -322,7 +322,7 @@ function AppIndex(props: AppProps) {
               elevation={2}
               component="form"
               className={classes.actionCard}
-              onSubmit={handleNewOrg((data: OrgData) => createNeworg(data))}
+              onSubmit={handleNewOrg((data: NewOrgData) => createNeworg(data))}
             >
               <CardContent>
                 <Box display="flex" justifyContent="center">

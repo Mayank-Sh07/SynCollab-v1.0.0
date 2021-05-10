@@ -76,12 +76,7 @@ let SyncollabTheme = createMuiTheme({
       },
       label: {
         textTransform: "none",
-      },
-      contained: {
-        boxShadow: "none",
-        "&:active": {
-          boxShadow: "none",
-        },
+        textOverflow: "ellipsis",
       },
     },
     MuiTabs: {

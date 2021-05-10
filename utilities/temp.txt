@@ -1,0 +1,58 @@
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({})
+);
+
+
+[
+  {
+    org_name: 'Org one',
+    about_org: 'None ',
+    date_created: '2021-05-08',
+    managers: [ 'ff3ae4da-f558-4bf6-8285-fa0eb0b046ef' ],
+    profiles: {
+      username: 'mike',
+      email: 'mike74600@gmail.com',
+      full_name: 'Mayank Sharma',
+      avatar_url: 'https://icotar.com/initials/M.png'
+    },
+    source: [ {
+      uid: "ff3ae4da-f558-4bf6-8285-fa0eb0b046ef",
+      oid: 17,
+      tid: "f3e2b701-1603-409e-8244-0795f6c5e2e9",
+      role: "Manager",
+      inserted_at: "2021-05-08T17:44:34.093461+00:00"
+  } ]
+  }
+]
+
+
+[
+    {
+        "org_name": "Org one",
+        "about_org": "None ",
+        "date_created": "2021-05-08",
+        "managers": [
+            "ff3ae4da-f558-4bf6-8285-fa0eb0b046ef"
+        ],
+        "profiles": {
+            "username": "mike",
+            "email": "mike74600@gmail.com",
+            "full_name": "Mayank Sharma",
+            "avatar_url": "https://icotar.com/initials/M.png"
+        },
+        "source": [
+            {
+                "role": "Manager",
+                "inserted_at": "2021-05-08T17:44:34.093461+00:00",
+                "profiles": {
+                    "username": "mike",
+                    "email": "mike74600@gmail.com"
+                },
+                "teams": {
+                    "team_name": "Team-1"
+                }
+            }
+        ]
+    }
+]
+

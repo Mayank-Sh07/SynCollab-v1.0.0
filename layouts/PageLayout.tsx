@@ -2,7 +2,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { PageLayoutProps } from "@/types/local";
+import { LayoutProps, TabRoutes } from "@/types/local";
 import {
   createStyles,
   makeStyles,
@@ -42,9 +42,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     appBar: {
       backgroundColor: theme.palette.primary.dark,
+      paddingBottom: theme.spacing(1),
     },
     toolBar: {
-      minHeight: 58,
+      minHeight: 64,
       paddingTop: theme.spacing(2),
       [theme.breakpoints.only("xs")]: {
         paddingRight: 0,
@@ -69,13 +70,24 @@ const useStyles = makeStyles((theme: Theme) =>
     footer: {
       marginTop: theme.spacing(6),
       marginBottom: theme.spacing(8),
+      [theme.breakpoints.only("xs")]: {
+        marginBottom: theme.spacing(4),
+      },
     },
     footerTitle: {
       fontWeight: 700,
       marginLeft: theme.spacing(1),
+      flexGrow: 1,
     },
     footerItem: {
       marginRight: theme.spacing(2),
+    },
+    copyrightContainer: {
+      justifyContent: "space-between",
+      [theme.breakpoints.only("xs")]: {
+        justifyContent: "center",
+        padding: theme.spacing(2),
+      },
     },
     "@global": {
       ul: {
@@ -87,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function HideOnScroll(props: PageLayoutProps): React.ReactElement {
+function HideOnScroll(props: LayoutProps): React.ReactElement {
   const { children, window } = props;
   const trigger: boolean = useScrollTrigger({
     target: window ? window() : undefined,
@@ -99,16 +111,17 @@ function HideOnScroll(props: PageLayoutProps): React.ReactElement {
   );
 }
 
-export default function PageLayout(props: PageLayoutProps) {
+export default function PageLayout(props: LayoutProps) {
   const classes = useStyles();
-  const router = useRouter();
-  const [value, setValue] = React.useState(0);
+  const { route, push: routeTo } = useRouter();
+  const [path, setPath] = React.useState(() =>
+    TabRoutes.includes(route) ? route : false
+  );
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+  const handleChange = (event: React.ChangeEvent<{}>, newPath: string) => {
+    setPath(newPath);
+    routeTo(newPath);
   };
-
-  const handleTabClick = (path: string) => router.push(path);
 
   return (
     <React.Fragment>
@@ -139,24 +152,20 @@ export default function PageLayout(props: PageLayoutProps) {
               </Hidden>
               <Hidden xsDown>
                 <Tabs
-                  value={value}
+                  value={path}
                   onChange={handleChange}
                   className={classes.tabSection}
                 >
-                  <Tab
-                    label="Home"
-                    classes={{ root: classes.tab }}
-                    onClick={() => handleTabClick("/")}
-                  />
+                  <Tab label="Home" classes={{ root: classes.tab }} value="/" />
                   <Tab
                     label="About"
                     classes={{ root: classes.tab }}
-                    onClick={() => handleTabClick("/about")}
+                    value="/about"
                   />
                   <Tab
                     label="Pricing"
                     classes={{ root: classes.tab }}
-                    onClick={() => handleTabClick("/pricing")}
+                    value="/pricing"
                   />
                 </Tabs>
               </Hidden>
@@ -188,7 +197,7 @@ export default function PageLayout(props: PageLayoutProps) {
             </IconButton>
           </Grid>
         </Grid>
-        <Grid container justify="space-between">
+        <Grid container className={classes.copyrightContainer}>
           <Grid item>
             <Typography variant="caption" color="textSecondary">
               Made by{" "}

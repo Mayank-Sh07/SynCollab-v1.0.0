@@ -1,8 +1,8 @@
 import React from "react";
-import { Org, User, Nav, NavigatorData } from "@/types/local";
-import { getNavData } from "@/utils/functions";
 import clsx from "clsx";
 import useSWR from "swr";
+import { OrgLocalStorage, User, Nav, NavigatorData } from "@/types/local";
+import { getNavData } from "@/utils/functions";
 import {
   createStyles,
   Theme,
@@ -71,12 +71,12 @@ const styles = (theme: Theme) =>
 interface NavigatorProps
   extends Omit<DrawerProps, "classes">,
     WithStyles<typeof styles>,
-    Org {
+    OrgLocalStorage {
   user: User;
 }
 
 function Navigator(props: NavigatorProps) {
-  const [selectedItem, setSelectedItem] = React.useState("About");
+  const [selectedItem, setSelectedItem] = React.useState("");
   const { classes, orgId, orgName, user, ...other } = props;
   const { data } = useSWR([orgId, user.id], getNavData);
   const baseOrgURL = `/app/${orgId}/`;

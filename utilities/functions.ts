@@ -1,8 +1,8 @@
 import { supabase } from "@/supabase/index";
-import { Team, Organization, definitions } from "@/types/local";
+import { TeamNav, UserOrganization, definitions } from "@/types/local";
 
 export const getNavData = async (orgId: string, userId: string) => {
-  let { data: teams } = await supabase.rpc<Team>("get_user_org_teams", {
+  let { data: teams } = await supabase.rpc<TeamNav>("get_user_org_teams", {
     user_id: userId,
     org_id: orgId,
   });
@@ -19,7 +19,7 @@ export const getNotificationCount = async (userId: string) => {
 };
 
 export const fetchOganizations = async (userId: string) => {
-  let { data: organizations } = await supabase.rpc<Organization>(
+  let { data: organizations } = await supabase.rpc<UserOrganization>(
     "get_user_orgs",
     {
       user_id: userId,
@@ -37,3 +37,17 @@ export const setOrg = (
     localStorage.setItem("orgData", JSON.stringify({ orgId, orgName }));
   }
 };
+
+export const dateFormatRegex = (date: string) =>
+  date.replace(
+    /(\d{4})-(\d{1,2})-(\d{1,2})/,
+    (match, y, m, d) => d + "-" + m + "-" + y
+  );
+
+export const truncate = (str: string, max: number, suffix: string) =>
+  str.length < max
+    ? str
+    : `${str.substr(
+        0,
+        str.substr(0, max - suffix.length).lastIndexOf(" ")
+      )}${suffix}`;

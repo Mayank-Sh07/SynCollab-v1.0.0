@@ -1,7 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
-import { Org, User } from "@/types/local";
+import { OrgLocalStorage, User } from "@/types/local";
 import { getNotificationCount } from "@/utils/functions";
 import {
   createStyles,
@@ -52,7 +52,7 @@ const styles = (theme: Theme) =>
     },
   });
 
-interface HeaderProps extends WithStyles<typeof styles>, Org {
+interface HeaderProps extends WithStyles<typeof styles>, OrgLocalStorage {
   onDrawerToggle: () => void;
   user: User;
 }
@@ -68,7 +68,7 @@ function Header(props: HeaderProps) {
       <AppBar color="primary" position="fixed" elevation={0}>
         <Toolbar className={classes.appBar}>
           <Grid container spacing={1} alignItems="center">
-            <Hidden smUp>
+            <Hidden lgUp>
               <Grid item>
                 <IconButton
                   color="inherit"

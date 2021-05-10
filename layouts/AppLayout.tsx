@@ -1,11 +1,11 @@
 import React from "react";
 import { useUser } from "@/supabase/authentication";
-import { Org } from "@/types/local";
+import { OrgLocalStorage, LayoutProps } from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import ToolBar from "@material-ui/core/Toolbar";
 import Hidden from "@material-ui/core/Hidden";
 import Navigator from "@/components/Navigator";
-import Copyright from "@/components/Copyrights";
 import Header from "@/components/Header";
 import Loader from "@/components/Loader";
 
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: "100vh",
     },
     drawer: {
-      [theme.breakpoints.up("sm")]: {
+      [theme.breakpoints.up("lg")]: {
         width: drawerWidth,
         flexShrink: 0,
       },
@@ -30,21 +30,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     main: {
       flex: 1,
-      padding: theme.spacing(6, 4),
-      background: "#eaeff1",
-    },
-    footer: {
-      padding: theme.spacing(2),
-      background: "#eaeff1",
+      padding: theme.spacing(5, 2),
+      background: theme.palette.primary.dark,
     },
   })
 );
 
-function AppLayout() {
+function AppLayout(props: LayoutProps) {
   const classes = useStyles();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { children } = props;
   const { user } = useUser();
-  let orgData: Org | null = null;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  let orgData: OrgLocalStorage | null = null;
   if (typeof window !== "undefined") {
     //@ts-expect-error
     orgData = JSON.parse(localStorage.getItem("orgData"));
@@ -61,7 +58,7 @@ function AppLayout() {
     <div className={classes.root}>
       <CssBaseline />
       <nav className={classes.drawer}>
-        <Hidden smUp implementation="js">
+        <Hidden lgUp implementation="js">
           <Navigator
             PaperProps={{ style: { width: drawerWidth } }}
             variant="temporary"
@@ -72,7 +69,7 @@ function AppLayout() {
             user={user}
           />
         </Hidden>
-        <Hidden xsDown implementation="css">
+        <Hidden mdDown implementation="css">
           <Navigator
             PaperProps={{ style: { width: drawerWidth } }}
             orgId={orgData.orgId}
@@ -88,10 +85,8 @@ function AppLayout() {
           orgName={orgData.orgName}
           onDrawerToggle={handleDrawerToggle}
         />
-        <main className={classes.main}>{<h3>HELLO WORLD</h3>}</main>
-        <footer className={classes.footer}>
-          <Copyright />
-        </footer>
+        <ToolBar />
+        <main className={classes.main}>{children}</main>
       </div>
     </div>
   );
