@@ -6,14 +6,29 @@ import Typography from "@material-ui/core/Typography";
 export default function BoxTypography(
   props: SectionTitleProps
 ): React.ReactElement {
-  const { children, component, color, maxWidth, paragraph, ...rest } = props;
+  const {
+    children,
+    component,
+    color,
+    maxWidth,
+    paragraph,
+    className,
+    fontSize,
+    lineHeight,
+    ...rest
+  } = props;
   return (
-    <Box component="div" maxWidth={maxWidth} {...rest}>
+    <Box component="div" maxWidth={maxWidth} lineHeight={lineHeight} {...rest}>
       <Typography
         color={color}
         paragraph={paragraph}
+        className={className}
         {...rest}
-        style={{ fontWeight: "inherit" }}
+        style={{
+          lineHeight: "inherit",
+          fontWeight: "inherit",
+          fontSize: !!fontSize ? fontSize : undefined,
+        }}
       >
         {children}
       </Typography>

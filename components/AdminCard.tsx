@@ -7,8 +7,11 @@ import Paper from "@material-ui/core/Paper";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Chip from "@material-ui/core/Chip";
 
 import LinkIcon from "@material-ui/icons/LaunchRounded";
+import CreatorIcon from "@material-ui/icons/OfflineBolt";
+import AdminIcon from "@material-ui/icons/CheckCircle";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1, 2),
       minWidth: 180,
       maxWidth: 200,
+      border: `1px solid ${theme.palette.primary.main}`,
       "& > *": {
         margin: theme.spacing(1),
       },
@@ -32,15 +36,37 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 64,
       width: 64,
     },
+    chip: {
+      fontWeight: 600,
+      padding: "0px 2px 1px",
+      marginBottom: theme.spacing(2),
+    },
   })
 );
 
 export default function AdminCard(props: AdminCardProps): React.ReactElement {
   const classes = useStyles();
-  const { uid, avatar_url, full_name, username } = props;
+  const { uid, avatar_url, full_name, username, isCreator } = props;
   return (
     <Grid item xs={12} sm={4} md={3} key={uid}>
       <Paper elevation={3} className={classes.adminCard}>
+        {isCreator ? (
+          <Chip
+            icon={<CreatorIcon />}
+            label="Creator"
+            color="secondary"
+            size="small"
+            className={classes.chip}
+          />
+        ) : (
+          <Chip
+            icon={<AdminIcon />}
+            label="Admin"
+            color="primary"
+            size="small"
+            className={classes.chip}
+          />
+        )}
         <Avatar className={classes.adminAvatar} src={avatar_url} />
         <Typography variant="caption" gutterBottom>
           <strong>{full_name}</strong>

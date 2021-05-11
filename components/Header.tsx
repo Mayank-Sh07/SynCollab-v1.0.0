@@ -85,13 +85,13 @@ function Header(props: HeaderProps) {
               <Tooltip
                 title={n === 0 ? "Alerts • No alerts" : `Alerts • ${n} alerts`}
               >
-                <Link href={baseOrgURL + "notifications"}>
-                  <IconButton className={classes.menuButton}>
-                    <Badge badgeContent={n} color="secondary">
-                      <NotificationsIcon />
-                    </Badge>
-                  </IconButton>
-                </Link>
+                {/* <Link href={baseOrgURL + "notifications"}> */}
+                <IconButton className={classes.menuButton}>
+                  <Badge badgeContent={n} color="secondary">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                {/* </Link> */}
               </Tooltip>
             </Grid>
             <Grid item>

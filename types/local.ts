@@ -2,6 +2,8 @@ import { AnchorHTMLAttributes } from "react";
 import { LinkProps as NextLinkProps } from "next/link";
 import { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
 import { BoxProps as MuiBoxProps } from "@material-ui/core/Box";
+import { ContainerTypeMap } from "@material-ui/core/Container";
+import { DataGridProps } from "@material-ui/data-grid";
 import { TypographyProps as MuiTypographyProps } from "@material-ui/core/Typography";
 import { User } from "@supabase/supabase-js";
 import { definitions } from "./supabase";
@@ -64,11 +66,11 @@ export interface LayoutProps {
 }
 
 export interface AdminCardProps {
-  key: string;
   uid: string;
   username: string;
-  full_name: string;
-  avatar_url: string;
+  full_name?: string;
+  avatar_url?: string;
+  isCreator?: boolean;
 }
 
 export interface FeatureCardProps {
@@ -97,6 +99,10 @@ export interface SectionTitleProps
   extends Omit<MuiBoxProps, "color">,
     Omit<MuiTypographyProps, "display"> {}
 
+export interface TableProps extends DataGridProps {
+  containerProps: Omit<ContainerTypeMap["props"], "children">;
+}
+
 export interface NextLinkComposedProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
     Omit<NextLinkProps, "href" | "as"> {
@@ -116,23 +122,18 @@ export type LinkProps = {
 export const TabRoutes = ["/", "/about", "/pricing"];
 
 export interface OrgIndexPageData {
-  oid: number;
+  oid?: number;
   org_name: string;
   about_org: string;
+  creator_id: string;
   date_created: string;
   managers: string[];
-  profiles: {
-    username: string;
-    email: string;
-    full_name: string;
-    avatar_url: string;
-  };
   source: {
     role: string;
     inserted_at: string;
     profiles: {
       username: string;
-      email: string;
+      full_name: string;
     };
     teams: {
       team_name: string;
@@ -142,26 +143,33 @@ export interface OrgIndexPageData {
 [];
 
 export interface OrgIndexPageProps {
-  orgCreatorData: {
-    username: string;
-    email: string;
-    full_name: string;
-    avatar_url: string;
-  };
-  tableData: {
-    userName: string;
-    email: string;
-    teamName: string;
-    role: string;
-    dateAdded: string;
-  }[];
-  orgData: {
-    oid: number;
+  OrgData: {
+    oid?: number;
+    creator_id: string;
     org_name: string;
     about_org: string;
     date_created: string;
     managers: string[];
   };
+  TableData: {
+    id: string;
+    userName: string;
+    full_name: string;
+    teamName: string;
+    role: string;
+    dateAdded: string;
+  }[];
+  AdminProfiles:
+    | {
+        uid: string;
+        email: string;
+        username: string;
+        full_name?: string | undefined;
+        avatar_url?: string | undefined;
+        updated_at?: string | undefined;
+      }[]
+    | null;
+  error: boolean;
 }
 
 export const title1: SectionTitleProps = {
@@ -169,7 +177,14 @@ export const title1: SectionTitleProps = {
   align: "center",
   fontWeight: 700,
   letterSpacing: { xs: -1, sm: -2 },
-  padding: 2,
+  mt: 3,
+  mb: 2,
+};
+
+export const title2: SectionTitleProps = {
+  variant: "h4",
+  align: "center",
+  fontWeight: 700,
   mt: 4,
   mb: 2,
 };
@@ -179,15 +194,15 @@ export const title3: SectionTitleProps = {
   align: "center",
   fontWeight: 700,
   mt: 2,
-  mb: 2,
+  mb: 1,
 };
 
 export const subtitle1: SectionTitleProps = {
   paragraph: true,
   align: "center",
   color: "textSecondary",
-  mt: 2,
-  mb: 2,
+  mt: 1,
+  mb: 1,
 };
 
 export const subtitle2: SectionTitleProps = {
@@ -196,6 +211,14 @@ export const subtitle2: SectionTitleProps = {
   align: "justify",
   color: "textSecondary",
   letterSpacing: "0.03rem",
+  mt: 2,
+  mb: 2,
+};
+
+export const error1: SectionTitleProps = {
+  variant: "body1",
+  align: "center",
+  color: "error",
   mt: 2,
   mb: 2,
 };
