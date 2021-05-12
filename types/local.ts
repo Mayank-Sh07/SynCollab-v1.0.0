@@ -45,6 +45,10 @@ export interface TeamCode {
   teamCode: string;
 }
 
+export interface UserId {
+  userId: string;
+}
+
 export interface Nav {
   id: string;
   icon: JSX.Element | Element;
@@ -93,6 +97,35 @@ export interface FeatureImageCardProps {
   header: string;
   title: string;
   description: string;
+}
+
+export interface NotificationData {
+  nid: number;
+  sender_id: string;
+  receiver_id: string;
+  oid: number;
+  tid: string;
+  role: null;
+  body: string;
+  date_created: string;
+  status: string;
+  type: string;
+  profiles: {
+    username: string;
+    full_name: string;
+    avatar_url: string;
+  };
+}
+[];
+
+export interface NotificationProps {
+  type: string;
+  date: string;
+  fullname: string;
+  username: string;
+  avatarURL: string;
+  body: string;
+  senderId: string;
 }
 
 export interface SectionTitleProps

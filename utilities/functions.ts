@@ -1,5 +1,5 @@
 import { supabase } from "@/supabase/index";
-import { TeamNav, UserOrganization, definitions } from "@/types/local";
+import { TeamNav, UserOrganization, NotificationData } from "@/types/local";
 
 export const getNavData = async (orgId: string, userId: string) => {
   let { data: teams } = await supabase.rpc<TeamNav>("get_user_org_teams", {
@@ -9,13 +9,19 @@ export const getNavData = async (orgId: string, userId: string) => {
   return teams;
 };
 
-export const getNotificationCount = async (userId: string) => {
-  let { count } = await supabase
-    .from<definitions["notifications"]>("notifications")
-    .select("nid", { count: "exact" })
+export const getNotificationData = async (userId: string) => {
+  let { data, error } = await supabase
+    .from<NotificationData>("notifications")
+    .select(`*,profiles:sender_id(username,full_name,avatar_url)`)
     .eq("receiver_id", userId);
 
-  return !!count ? count : 0;
+  let errorBool: boolean = false;
+  if (error) {
+    console.log("ERROR:", error);
+    errorBool = true;
+  }
+
+  return { data, fetchError: errorBool };
 };
 
 export const fetchOganizations = async (userId: string) => {

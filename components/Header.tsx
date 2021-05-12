@@ -1,8 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import useSWR from "swr";
+import NotificationModal from "./NotificationModal";
 import { OrgLocalStorage, User } from "@/types/local";
-import { getNotificationCount } from "@/utils/functions";
 import {
   createStyles,
   Theme,
@@ -16,10 +15,8 @@ import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
-import Badge from "@material-ui/core/Badge";
 
 import MenuIcon from "@material-ui/icons/Menu";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import SettingsIcon from "@material-ui/icons/Settings";
 
 const UserAvatar = dynamic(() => import("@/components/UserAvatar"), {
@@ -59,8 +56,6 @@ interface HeaderProps extends WithStyles<typeof styles>, OrgLocalStorage {
 
 function Header(props: HeaderProps) {
   const { classes, onDrawerToggle, orgId, user } = props;
-  const { data: notificationCount } = useSWR(user.id, getNotificationCount);
-  const n: number = notificationCount === undefined ? 0 : notificationCount;
   const baseOrgURL = `/app/${orgId}/`;
 
   return (
@@ -82,17 +77,7 @@ function Header(props: HeaderProps) {
             </Hidden>
             <Grid item xs />
             <Grid item>
-              <Tooltip
-                title={n === 0 ? "Alerts • No alerts" : `Alerts • ${n} alerts`}
-              >
-                {/* <Link href={baseOrgURL + "notifications"}> */}
-                <IconButton className={classes.menuButton}>
-                  <Badge badgeContent={n} color="secondary">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-                {/* </Link> */}
-              </Tooltip>
+              <NotificationModal userId={user.id} />
             </Grid>
             <Grid item>
               <Tooltip title="Manage Organization">
