@@ -98,15 +98,6 @@ const useStyles = makeStyles((theme: Theme) =>
     secondaryColour: {
       color: theme.palette.secondary.main,
     },
-    dateBox: {
-      padding: theme.spacing(1, 2),
-      border: `2px solid ${theme.palette.secondary.main}`,
-      borderRadius: "2px",
-      width: "max-content",
-      [theme.breakpoints.up("sm")]: {
-        marginLeft: "24px",
-      },
-    },
     textJustify: {
       textAlign: "center",
       [theme.breakpoints.only("xs")]: {
@@ -128,16 +119,6 @@ function About(props: OrgIndexPageProps) {
     <div>
       <Container>
         <Paper elevation={6} className={classes.mainPaper}>
-          <BoxTypography
-            variant="caption"
-            color="textSecondary"
-            className={classes.dateBox}
-          >
-            {" Created on "}
-            <span className={classes.secondaryColour}>
-              {dateFormatRegex(OrgData.date_created)}
-            </span>
-          </BoxTypography>
           <div>
             <BoxTypography {...title1}>{OrgData.org_name}</BoxTypography>
             <BoxTypography
@@ -146,7 +127,9 @@ function About(props: OrgIndexPageProps) {
               {...subtitle1}
               className={classes.textJustify}
             >
-              {OrgData.about_org}
+              {OrgData.about_org +
+                " This organization was created on " +
+                dateFormatRegex(OrgData.date_created)}
             </BoxTypography>
           </div>
           <div>

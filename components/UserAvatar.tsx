@@ -23,12 +23,20 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import LoginIcon from "@material-ui/icons/AccountCircle";
 import SignoutIcon from "@material-ui/icons/ExitToApp";
 import ProfileIcon from "@material-ui/icons/AccountCircle";
+import Profile from "./Profile";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menuButton: {
       marginRight: theme.spacing(1),
       backgroundColor: fade(theme.palette.secondary.main, 0.125),
+    },
+    menu: {
+      borderRadius: "2px",
+      backgroundColor: theme.palette.primary.main,
+    },
+    menuItem: {
+      paddingRight: theme.spacing(4),
     },
   })
 );
@@ -55,7 +63,6 @@ export default function UserAvatar() {
 
   const showProfile = (event: React.MouseEvent<HTMLElement>) => {
     handleClose();
-    router.push("/profile");
   };
 
   const signOut = async (event: React.MouseEvent<HTMLElement>) => {
@@ -104,18 +111,30 @@ export default function UserAvatar() {
         keepMounted
         open={open}
         onClose={handleClose}
+        PaperProps={{
+          className: classes.menu,
+        }}
+        anchorOrigin={{
+          vertical: 40,
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        getContentAnchorEl={null}
       >
-        <MenuItem onClick={showProfile}>
+        <Profile userName={userProfile.username} editable={true}>
+          <MenuItem onClick={showProfile} className={classes.menuItem}>
+            <ListItemIcon>
+              <ProfileIcon style={{ fontSize: 24, minWidth: 44 }} />
+            </ListItemIcon>
+            {"Profile"}
+          </MenuItem>
+        </Profile>
+        <MenuItem onClick={signOut} className={classes.menuItem}>
           <ListItemIcon>
-            <ProfileIcon fontSize="small" />
-          </ListItemIcon>
-          <Typography variant="inherit" noWrap>
-            Profile
-          </Typography>
-        </MenuItem>
-        <MenuItem onClick={signOut}>
-          <ListItemIcon>
-            <SignoutIcon fontSize="small" />
+            <SignoutIcon style={{ fontSize: 24, minWidth: 44 }} />
           </ListItemIcon>
           <Typography variant="inherit" noWrap>
             Signout

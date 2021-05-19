@@ -80,15 +80,6 @@ function Header(props: HeaderProps) {
               <NotificationModal userId={user.id} />
             </Grid>
             <Grid item>
-              <Tooltip title="Manage Organization">
-                <Link href={baseOrgURL + "settings"}>
-                  <IconButton className={classes.menuButton}>
-                    <SettingsIcon />
-                  </IconButton>
-                </Link>
-              </Tooltip>
-            </Grid>
-            <Grid item>
               <UserAvatar />
             </Grid>
           </Grid>

@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import BoxTypography from "./BoxTypography";
 import { NotificationProps } from "@/types/local";
+import { deleteNotification } from "@/utils/functions";
 // Material-UI Core
 import {
   createStyles,
@@ -19,6 +20,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import MessageIcon from "@material-ui/icons/Message";
 import RequestIcon from "@material-ui/icons/AddAlert";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import RemoveIcon from "@material-ui/icons/Cancel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -84,7 +86,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     messageColor: {
-      color: "#31B6AD",
+      color: theme.palette.info.light,
     },
   })
 );
@@ -92,10 +94,17 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Notification(props: NotificationProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const [hide, setHidden] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  const handleNotificationDelete = (nid: number) => {
+    deleteNotification(nid);
+    setHidden(true);
+  };
+
   const NotificationHead = () =>
     props.type === "INFO" ? (
       <>
@@ -120,7 +129,12 @@ export default function Notification(props: NotificationProps) {
     );
 
   return (
-    <Paper square elevation={6} className={classes.notificationContainer}>
+    <Paper
+      square
+      elevation={6}
+      className={classes.notificationContainer}
+      hidden={hide}
+    >
       <Grid container spacing={0} className={classes.bodyContainer}>
         <Grid item xs={10}>
           <Grid container direction="column">
@@ -129,7 +143,14 @@ export default function Notification(props: NotificationProps) {
               <BoxTypography color="textSecondary" fontSize={12}>
                 • {props.date}
               </BoxTypography>
-              {!(props.type === "INFO") && (
+              {props.type === "INFO" ? (
+                <Tooltip placement="right" title={"Delete Notification"}>
+                  <RemoveIcon
+                    onClick={() => handleNotificationDelete(props.nid)}
+                    className={clsx(classes.expand, classes.messageColor)}
+                  />
+                </Tooltip>
+              ) : (
                 <Tooltip
                   placement="right"
                   title={expanded ? "Hide Actions" : "Show Actions"}

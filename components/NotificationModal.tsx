@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
     menuPaper: {
       maxHeight: 600,
       width: 400,
+      padding: "4px",
       backgroundColor: "#262C31",
       scrollbarWidth: "none", // Firefox
       "&::-webkit-scrollbar": {
@@ -44,10 +45,8 @@ export default function NotificationModal({ userId }: UserId) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  console.log(Notifications);
-
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+    if (NotificationCount !== 0) setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
@@ -106,6 +105,7 @@ export default function NotificationModal({ userId }: UserId) {
               <div key={item.nid}>
                 <Notification
                   key={item.nid}
+                  nid={item.nid}
                   type={item.type}
                   date={dateFormatRegex(String(item.date_created).slice(0, 10))}
                   fullname={item.profiles.full_name}

@@ -1,7 +1,14 @@
 import { supabase } from "@/supabase/index";
-import { TeamNav, UserOrganization, NotificationData } from "@/types/local";
+import {
+  TeamNav,
+  UserOrganization,
+  NotificationData,
+  NotificationInsert,
+  NotificationUpdate,
+  Notifications,
+} from "@/types/local";
 
-export const getNavData = async (orgId: string, userId: string) => {
+export const getNavData = async (orgId: string | number, userId: string) => {
   let { data: teams } = await supabase.rpc<TeamNav>("get_user_org_teams", {
     user_id: userId,
     org_id: orgId,
@@ -44,6 +51,35 @@ export const setOrg = (
   }
 };
 
+export const insertNotification = async (
+  props: NotificationInsert
+): Promise<boolean> => {
+  const { error } = await supabase
+    .from<Notifications>("notifications")
+    .insert([{ ...props }], { returning: "minimal" });
+
+  return Boolean(error);
+};
+
+export const updateNotification = async (
+  props: NotificationUpdate
+): Promise<boolean> => {
+  const { error } = await supabase
+    .from<Notifications>("notifications")
+    .update({ ...props }, { returning: "minimal" })
+    .eq("nid", props.nid);
+
+  return Boolean(error);
+};
+
+export const deleteNotification = async (nid: number) => {
+  let { error } = await supabase.rpc("delete_notification", {
+    notification_id: nid,
+  });
+
+  if (error) console.error(error);
+};
+
 export const dateFormatRegex = (date: string) =>
   date.replace(
     /(\d{4})-(\d{1,2})-(\d{1,2})/,
@@ -57,3 +93,15 @@ export const truncate = (str: string, max: number, suffix: string) =>
         0,
         str.substr(0, max - suffix.length).lastIndexOf(" ")
       )}${suffix}`;
+
+// export const showProfile = (
+//   setter: (value: React.SetStateAction<boolean>) => void
+// ) => {
+//   setter(true);
+// };
+
+// export const closeProfile = (
+//   setter: (value: React.SetStateAction<boolean>) => void
+// ) => {
+//   setter(false);
+// };

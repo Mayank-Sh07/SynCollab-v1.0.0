@@ -12,6 +12,12 @@ export * from "@supabase/supabase-js";
 
 export * from "./supabase";
 
+export type Organizations = definitions["organizations"];
+export type Teams = definitions["teams"];
+export type Profiles = definitions["profiles"];
+export type Source = definitions["source"];
+export type Notifications = definitions["notifications"];
+
 export interface OrgLocalStorage {
   orgId: number;
   orgName: string;
@@ -119,6 +125,7 @@ export interface NotificationData {
 [];
 
 export interface NotificationProps {
+  nid: number;
   type: string;
   date: string;
   fullname: string;
@@ -126,6 +133,32 @@ export interface NotificationProps {
   avatarURL: string;
   body: string;
   senderId: string;
+}
+
+export interface NotificationInsert
+  extends Omit<Notifications, "date_created" | "nid"> {}
+
+export interface NotificationUpdate
+  extends Omit<Notifications, "date_created"> {}
+
+export interface TeamsData extends Teams {
+  organizations: {
+    creator_id: string;
+  };
+  source: {
+    uid: string;
+  }[];
+  isUserTeam: boolean;
+  orgId: number;
+  user: User;
+}
+
+export interface TeamsProps {
+  Teams: TeamsData[] | null;
+  UserTeams: TeamNav[] | null;
+  orgId: number;
+  user: User;
+  fetchError: boolean;
 }
 
 export interface SectionTitleProps

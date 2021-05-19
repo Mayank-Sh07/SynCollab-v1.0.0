@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "@/components/Link";
 import { AdminCardProps } from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -12,6 +11,7 @@ import Chip from "@material-ui/core/Chip";
 import LinkIcon from "@material-ui/icons/LaunchRounded";
 import CreatorIcon from "@material-ui/icons/OfflineBolt";
 import AdminIcon from "@material-ui/icons/CheckCircle";
+import Profile from "./Profile";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,6 +40,10 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 600,
       padding: "0px 2px 1px",
       marginBottom: theme.spacing(2),
+    },
+    usernameBtn: {
+      padding: "2px 8px",
+      minWidth: 0,
     },
   })
 );
@@ -71,18 +75,23 @@ export default function AdminCard(props: AdminCardProps): React.ReactElement {
         <Typography variant="caption" gutterBottom>
           <strong>{full_name}</strong>
         </Typography>
-        {/* TODO: Build user API */}
-        <Link href={`#`} style={{ width: "100%" }}>
+        <Profile userName={username}>
+          {/* <div className={classes.userprofileBtn}>
+            <Typography variant="inherit" noWrap>
+              {username}
+            </Typography>
+            <LinkIcon style={{ margin: "0px 0px -6px 12px", fontSize: 18 }} />
+          </div> */}
           <Button
             variant="contained"
-            fullWidth
-            size="small"
             color="primary"
+            fullWidth
             endIcon={<LinkIcon />}
+            className={classes.usernameBtn}
           >
             {username}
           </Button>
-        </Link>
+        </Profile>
       </Paper>
     </Grid>
   );
