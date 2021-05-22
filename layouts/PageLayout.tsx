@@ -29,6 +29,8 @@ import PricingIcon from "@material-ui/icons/Style";
 import AboutIcon from "@material-ui/icons/EmojiObjects";
 import LinkedIn from "@material-ui/icons/LinkedIn";
 import Instagram from "@material-ui/icons/Instagram";
+import NotificationModal from "@/components/NotificationModal";
+import { useUser } from "@/supabase/authentication";
 
 const UserAvatar = dynamic(() => import("@/components/UserAvatar"), {
   ssr: false,
@@ -114,6 +116,7 @@ function HideOnScroll(props: LayoutProps): React.ReactElement {
 export default function PageLayout(props: LayoutProps) {
   const classes = useStyles();
   const { route, push: routeTo } = useRouter();
+  const { user } = useUser();
   const [path, setPath] = React.useState(() =>
     TabRoutes.includes(route) ? route : false
   );
@@ -135,17 +138,17 @@ export default function PageLayout(props: LayoutProps) {
               <div className={classes.spacer} />
               <Hidden smUp>
                 <Link href="/">
-                  <IconButton className={classes.menuButton}>
+                  <IconButton className={classes.menuButton} size="small">
                     <HomeIcon />
                   </IconButton>
                 </Link>
                 <Link href="/about">
-                  <IconButton className={classes.menuButton}>
+                  <IconButton className={classes.menuButton} size="small">
                     <AboutIcon />
                   </IconButton>
                 </Link>
                 <Link href="/pricing">
-                  <IconButton className={classes.menuButton}>
+                  <IconButton className={classes.menuButton} size="small">
                     <PricingIcon />
                   </IconButton>
                 </Link>
@@ -169,6 +172,7 @@ export default function PageLayout(props: LayoutProps) {
                   />
                 </Tabs>
               </Hidden>
+              <NotificationModal userId={user?.id} />
               <UserAvatar />
             </Toolbar>
           </Container>

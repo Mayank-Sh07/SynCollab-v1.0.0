@@ -144,13 +144,15 @@ export interface NotificationUpdate
 export interface TeamsData extends Teams {
   organizations: {
     creator_id: string;
+    managers: string[];
   };
   source: {
-    uid: string;
+    role: string;
   }[];
   isUserTeam: boolean;
   orgId: number;
   user: User;
+  isManager?: boolean;
 }
 
 export interface TeamsProps {
@@ -158,6 +160,7 @@ export interface TeamsProps {
   UserTeams: TeamNav[] | null;
   orgId: number;
   user: User;
+  isManager: boolean;
   fetchError: boolean;
 }
 

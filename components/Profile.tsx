@@ -88,8 +88,6 @@ export default function Profile(props: ProfileProps) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(0);
 
-  console.log(userData);
-
   React.useEffect(() => {
     async function getData() {
       let { data, error } = await supabase
@@ -200,7 +198,7 @@ export default function Profile(props: ProfileProps) {
                 onChangeIndex={handleChangeIndex}
               >
                 <TabPanel value={value} index={0}>
-                  <List component="div">
+                  <List component="ul">
                     <ListItem>
                       <ListItemAvatar>
                         <Avatar
@@ -254,17 +252,7 @@ export default function Profile(props: ProfileProps) {
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box p={1}>{children}</Box>}
-    </div>
-  );
+  return <div>{value === index && <Box p={1}>{children}</Box>}</div>;
 }
 
 function a11yProps(index: any) {

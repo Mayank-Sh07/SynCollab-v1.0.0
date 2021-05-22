@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   codeContainer: {
     fontSize: "0.565rem",
     color: "white",
-    backgroundColor: fade(theme.palette.secondary.dark, 0.25),
+    backgroundColor: fade(theme.palette.secondary.dark, 0.4),
     width: "100%",
     padding: "2px 8px",
     borderRadius: 3,

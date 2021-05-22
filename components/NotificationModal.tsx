@@ -4,7 +4,6 @@ import { getNotificationData, dateFormatRegex } from "@/utils/functions";
 import Notification from "./Notification";
 import Image from "./Image";
 import BoxTypography from "./BoxTypography";
-import { UserId } from "@/types/local";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
@@ -33,11 +32,19 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
     },
+    icon: {
+      marginRight: theme.spacing(2),
+      [theme.breakpoints.only("xs")]: {
+        marginRight: theme.spacing(1),
+      },
+    },
   })
 );
 
-export default function NotificationModal({ userId }: UserId) {
+export default function NotificationModal(props: any) {
   const classes = useStyles();
+  let userId = props.userId;
+
   const { data: Notifications, mutate } = useSWR(userId, getNotificationData);
   const NotificationCount: number = !Notifications?.data
     ? 0
@@ -58,7 +65,7 @@ export default function NotificationModal({ userId }: UserId) {
       <Tooltip
         title={!NotificationCount ? "No Notifications" : "Show Notifications"}
       >
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} className={classes.icon}>
           <Badge badgeContent={NotificationCount} color="secondary">
             <NotificationIcon />
           </Badge>

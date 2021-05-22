@@ -35,7 +35,7 @@ export const fetchOganizations = async (userId: string) => {
   let { data: organizations } = await supabase.rpc<UserOrganization>(
     "get_user_orgs",
     {
-      user_id: userId,
+      user_id: userId.replace("_org", ""),
     }
   );
   return organizations;
@@ -52,11 +52,11 @@ export const setOrg = (
 };
 
 export const insertNotification = async (
-  props: NotificationInsert
+  props: NotificationInsert[]
 ): Promise<boolean> => {
   const { error } = await supabase
     .from<Notifications>("notifications")
-    .insert([{ ...props }], { returning: "minimal" });
+    .insert(props, { returning: "minimal" });
 
   return Boolean(error);
 };
@@ -72,14 +72,6 @@ export const updateNotification = async (
   return Boolean(error);
 };
 
-export const deleteNotification = async (nid: number) => {
-  let { error } = await supabase.rpc("delete_notification", {
-    notification_id: nid,
-  });
-
-  if (error) console.error(error);
-};
-
 export const dateFormatRegex = (date: string) =>
   date.replace(
     /(\d{4})-(\d{1,2})-(\d{1,2})/,
@@ -93,15 +85,3 @@ export const truncate = (str: string, max: number, suffix: string) =>
         0,
         str.substr(0, max - suffix.length).lastIndexOf(" ")
       )}${suffix}`;
-
-// export const showProfile = (
-//   setter: (value: React.SetStateAction<boolean>) => void
-// ) => {
-//   setter(true);
-// };
-
-// export const closeProfile = (
-//   setter: (value: React.SetStateAction<boolean>) => void
-// ) => {
-//   setter(false);
-// };

@@ -124,14 +124,20 @@ export default function UserAvatar() {
         }}
         getContentAnchorEl={null}
       >
-        <Profile userName={userProfile.username} editable={true}>
-          <MenuItem onClick={showProfile} className={classes.menuItem}>
-            <ListItemIcon>
-              <ProfileIcon style={{ fontSize: 24, minWidth: 44 }} />
-            </ListItemIcon>
-            {"Profile"}
-          </MenuItem>
-        </Profile>
+        <div>
+          <Profile userName={userProfile.username} editable={true}>
+            <MenuItem
+              onClick={showProfile}
+              className={classes.menuItem}
+              component="div"
+            >
+              <ListItemIcon>
+                <ProfileIcon style={{ fontSize: 24, minWidth: 44 }} />
+              </ListItemIcon>
+              {"Profile"}
+            </MenuItem>
+          </Profile>
+        </div>
         <MenuItem onClick={signOut} className={classes.menuItem}>
           <ListItemIcon>
             <SignoutIcon style={{ fontSize: 24, minWidth: 44 }} />

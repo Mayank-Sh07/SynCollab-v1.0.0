@@ -109,7 +109,7 @@ function AppIndex(props: AppIndexProps) {
     message: "",
   });
   const { data: organizations, mutate } = useSWR(
-    props.user.id,
+    props.user.id + "_org",
     fetchOganizations,
     { initialData: props.organizations }
   );
@@ -249,19 +249,13 @@ function AppIndex(props: AppIndexProps) {
     mutate();
   };
 
-  console.log(organizations);
-
   return (
     <Container maxWidth={"md"} className={classes.container}>
       <Paper elevation={0} className={classes.paper}>
         <Typography variant="h3" className={classes.pageTitle} gutterBottom>
           Organizations
         </Typography>
-        {Boolean(
-          organizations === null ||
-            organizations === undefined ||
-            organizations?.length === 0
-        ) && (
+        {!organizations || organizations.length === 0 ? (
           <>
             <Box display="flex" justifyContent="center" mb={2} mt={8}>
               <Image src="/organizations.svg" height={280} width={400} />
@@ -270,45 +264,46 @@ function AppIndex(props: AppIndexProps) {
               You have no existing Organizations
             </Typography>
           </>
-        )}
-        <Grid
-          container
-          spacing={4}
-          justify="space-evenly"
-          className={classes.gridContainer}
-        >
-          {organizations?.map((org) => (
-            <Grid item xs={12} sm={6} md={4} key={org.id}>
-              <Card className={classes.card} elevation={4}>
-                <CardContent>
-                  <Typography variant="h5" component="h2" gutterBottom>
-                    <b>{org.name}</b>
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    <strong>{org.date}</strong>
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    {truncate(org.about, 75, "...")}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Link
-                    href={`/app/${org.id}/`}
-                    style={{ textDecoration: "none !important" }}
-                  >
-                    <Button
-                      size="small"
-                      color="secondary"
-                      onClick={(event) => setOrg(event, org.id, org.name)}
+        ) : (
+          <Grid
+            container
+            spacing={4}
+            justify="space-evenly"
+            className={classes.gridContainer}
+          >
+            {organizations?.map((org) => (
+              <Grid item xs={12} sm={6} md={4} key={org.id}>
+                <Card className={classes.card} elevation={4}>
+                  <CardContent>
+                    <Typography variant="h5" component="h2" gutterBottom>
+                      <b>{org.name}</b>
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      <strong>{org.date}</strong>
+                    </Typography>
+                    <Typography variant="body2" component="p">
+                      {truncate(org.about, 75, "...")}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Link
+                      href={`/app/${org.id}/`}
+                      style={{ textDecoration: "none !important" }}
                     >
-                      Enter Organization
-                    </Button>
-                  </Link>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      <Button
+                        size="small"
+                        color="secondary"
+                        onClick={(event) => setOrg(event, org.id, org.name)}
+                      >
+                        Enter Organization
+                      </Button>
+                    </Link>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Paper>
       <Paper elevation={0} className={classes.paper}>
         <Grid
@@ -335,7 +330,7 @@ function AppIndex(props: AppIndexProps) {
                   align="center"
                   color="secondary"
                 >
-                  <b>Create an Organization</b>
+                  <b>Create Organization</b>
                 </Typography>
                 <Typography
                   variant="body2"
@@ -396,7 +391,7 @@ function AppIndex(props: AppIndexProps) {
                         variant="filled"
                         color="secondary"
                         multiline
-                        rows={2}
+                        rows={4}
                         fullWidth
                         size="small"
                         value={value}
@@ -453,7 +448,8 @@ function AppIndex(props: AppIndexProps) {
                     rules={{
                       required: "Team code required",
                       pattern: {
-                        value: /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+                        value:
+                          /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
                         message: "Invalid team code",
                       },
                     }}

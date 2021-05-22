@@ -2,6 +2,7 @@ import React from "react";
 import BoxTypography from "./BoxTypography";
 import Link from "./Link";
 import TeamCodeBox from "./TeamCodeBox";
+import UserSearchDialog from "./UserSearchDialog";
 import { TeamsData, title3 } from "@/types/local";
 import { insertNotification } from "@/utils/functions";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -34,6 +35,12 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(2),
       height: "2px",
     },
+    actions: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "0px 16px",
+    },
   })
 );
 
@@ -42,15 +49,17 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
   const baseOrgURL = `/app/${props.orgId}/`;
 
   const handleReqToJoin = async (event: React.SyntheticEvent) => {
-    const isErr = await insertNotification({
-      sender_id: props.user.id,
-      receiver_id: props.organizations.creator_id,
-      oid: props.orgId,
-      tid: props.tid,
-      type: "REQ_TO_JOIN",
-      body: "",
-      status: "PENDING",
-    });
+    const isErr = await insertNotification([
+      {
+        sender_id: props.user.id,
+        receiver_id: props.organizations.creator_id,
+        oid: props.orgId,
+        tid: props.tid,
+        type: "REQ_TO_JOIN",
+        body: "",
+        status: "PENDING",
+      },
+    ]);
 
     if (isErr) {
       console.log("Error while requesting to join team");
@@ -92,6 +101,7 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
               fullWidth
               color="secondary"
               startIcon={<LinkIcon />}
+              size="small"
             >
               OPEN TEAM
             </Button>
@@ -103,19 +113,27 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
             color="secondary"
             startIcon={<AddIcon style={{ marginTop: 2 }} />}
             onClick={handleReqToJoin}
+            size="small"
           >
             REQUEST TO JOIN
           </Button>
         )}
         <Divider className={classes.divider} />
-        <BoxTypography
-          variant="caption"
-          align="left"
-          ml="2px"
-          color="textSecondary"
-        >
-          {props.date_created}
-        </BoxTypography>
+        <div className={classes.actions}>
+          <BoxTypography
+            variant="caption"
+            align="left"
+            ml="2px"
+            color="textSecondary"
+          >
+            {props.date_created}
+          </BoxTypography>
+          <UserSearchDialog
+            orgId={props.oid}
+            teamId={props.tid}
+            uid={props.user.id}
+          />
+        </div>
       </Paper>
     </Grid>
   );

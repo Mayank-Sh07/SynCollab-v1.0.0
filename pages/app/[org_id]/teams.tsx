@@ -41,18 +41,28 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   let { data: Teams, error } = await supabase
     .from<TeamsData>("teams")
-    .select(`*,organizations:oid(creator_id),source(uid)`)
+    .select(`*,organizations:oid(creator_id),source(role)`)
     .eq("oid", orgId);
 
-  if (error) {
-    console.log(error.message);
-  }
+  const { data: orgmanagersArray } = await supabase
+    .from("organizations")
+    .select("managers")
+    .eq("oid", orgId);
 
+  if (error || !orgmanagersArray) {
+    console.log(error?.message);
+    return {
+      props: {},
+      redirect: { destination: "/auth/login", permanent: false },
+    };
+  }
   let fetchError: boolean = Boolean(error);
+
+  let isManager = orgmanagersArray[0].managers.includes(user.id);
 
   const UserTeams = await getNavData(orgId, user.id);
 
-  return { props: { Teams, UserTeams, orgId, user, fetchError } };
+  return { props: { Teams, UserTeams, orgId, user, isManager, fetchError } };
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -99,12 +109,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function Teams(props: TeamsProps) {
   const classes = useStyles();
-  const { Teams, UserTeams, orgId, user, fetchError } = props;
-  const userTeamIdArray = UserTeams?.map((team) => team.id);
+  const { Teams, UserTeams, orgId, user, isManager, fetchError } = props;
   const { control, handleSubmit, reset } = useForm();
   const [open, setOpen] = React.useState(false);
   const [added, setAdded] = React.useState(false);
   const [newTeamId, setTeamId] = React.useState(undefined);
+  const userTeamIdArray = UserTeams?.map((team) => team.id);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -129,14 +139,16 @@ function Teams(props: TeamsProps) {
     <div>
       <Container>
         <div className={classes.pageActions}>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="secondary"
-            onClick={handleClickOpen}
-          >
-            Add Team
-          </Button>
+          {isManager && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="secondary"
+              onClick={handleClickOpen}
+            >
+              Add Team
+            </Button>
+          )}
         </div>
         <Paper elevation={6} className={classes.mainPaper}>
           <BoxTypography {...title1}>{"Teams"}</BoxTypography>
@@ -150,6 +162,7 @@ function Teams(props: TeamsProps) {
                   isUserTeam={Boolean(userTeamIdArray?.includes(team.tid))}
                   orgId={orgId}
                   user={user}
+                  isManager={isManager}
                 />
               ))}
             </Grid>

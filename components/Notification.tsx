@@ -2,7 +2,6 @@ import React from "react";
 import clsx from "clsx";
 import BoxTypography from "./BoxTypography";
 import { NotificationProps } from "@/types/local";
-import { deleteNotification } from "@/utils/functions";
 // Material-UI Core
 import {
   createStyles,
@@ -21,6 +20,7 @@ import MessageIcon from "@material-ui/icons/Message";
 import RequestIcon from "@material-ui/icons/AddAlert";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import RemoveIcon from "@material-ui/icons/Cancel";
+import { supabase } from "../supabase";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,9 +100,33 @@ export default function Notification(props: NotificationProps) {
     setExpanded(!expanded);
   };
 
-  const handleNotificationDelete = (nid: number) => {
-    deleteNotification(nid);
-    setHidden(true);
+  const deleteNotification = async (nid: number) => {
+    let { error } = await supabase.rpc("delete_notification", {
+      notification_id: nid,
+    });
+
+    if (error) alert(error.message);
+    else setHidden(true);
+  };
+
+  const acceptNotification = async (nid: number) => {
+    const { error } = await supabase
+      .from("notifications")
+      .update({ status: "ACCEPTED" })
+      .eq("nid", nid);
+
+    if (error) alert(error.message);
+    else setHidden(true);
+  };
+
+  const declineNotification = async (nid: number) => {
+    const { error } = await supabase
+      .from("notifications")
+      .update({ status: "DECLINED" })
+      .eq("nid", nid);
+
+    if (error) alert(error.message);
+    else setHidden(true);
   };
 
   const NotificationHead = () =>
@@ -146,7 +170,7 @@ export default function Notification(props: NotificationProps) {
               {props.type === "INFO" ? (
                 <Tooltip placement="right" title={"Delete Notification"}>
                   <RemoveIcon
-                    onClick={() => handleNotificationDelete(props.nid)}
+                    onClick={() => deleteNotification(props.nid)}
                     className={clsx(classes.expand, classes.messageColor)}
                   />
                 </Tooltip>
@@ -189,10 +213,18 @@ export default function Notification(props: NotificationProps) {
       {!(props.type === "INFO") && (
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <Paper square elevation={0} className={classes.actionContainer}>
-            <Button color="secondary" size="small">
+            <Button
+              color="secondary"
+              size="small"
+              onClick={() => acceptNotification(props.nid)}
+            >
               ACCEPT
             </Button>
-            <Button color="secondary" size="small">
+            <Button
+              color="secondary"
+              size="small"
+              onClick={() => declineNotification(props.nid)}
+            >
               DECLINE
             </Button>
           </Paper>
