@@ -17,6 +17,8 @@ export type Teams = definitions["teams"];
 export type Profiles = definitions["profiles"];
 export type Source = definitions["source"];
 export type Notifications = definitions["notifications"];
+export type Objectives = definitions["objectives"];
+export type KeyResults = definitions["key_results"];
 
 export interface OrgLocalStorage {
   orgId: number;

@@ -172,7 +172,7 @@ export default function PageLayout(props: LayoutProps) {
                   />
                 </Tabs>
               </Hidden>
-              <NotificationModal userId={user?.id} />
+              {!!user && <NotificationModal userId={user?.id} />}
               <UserAvatar />
             </Toolbar>
           </Container>

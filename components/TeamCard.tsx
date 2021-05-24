@@ -13,7 +13,7 @@ import Divider from "@material-ui/core/Divider";
 
 import AddIcon from "@material-ui/icons/AddBox";
 import LinkIcon from "@material-ui/icons/Launch";
-import ObjectivesIcon from "@material-ui/icons/Adjust";
+import ObjectivesIcon from "@material-ui/icons/TrackChanges";
 import UsersIcon from "@material-ui/icons/People";
 import ResultsIcon from "@material-ui/icons/AssistantPhoto";
 

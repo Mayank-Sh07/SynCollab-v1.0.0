@@ -56,3 +56,50 @@ const useStyles = makeStyles((theme: Theme) =>
     }
 ]
 
+
+import React from "react";
+import PageLayout from "@/layouts/PageLayout";
+import { GetServerSideProps } from "next";
+import { supabase } from "@/supabase/index";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  query,
+}) => {
+  const { user } = await supabase.auth.api.getUserByCookie(req);
+  let { org_id }: any = query;
+  if (!user || org_id === undefined) {
+    return {
+      props: {},
+      redirect: { destination: "/auth/login", permanent: false },
+    };
+  }
+  const orgId: number = parseInt(org_id);
+
+  return { props: { user, orgId } };
+};
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    container: {
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
+    },
+  })
+);
+
+function TeamIndex(props: any) {
+  const classes = useStyles();
+
+  return (
+    <Container maxWidth={"md"} className={classes.container}>
+      Hello
+    </Container>
+  );
+}
+
+TeamIndex.layout = PageLayout;
+
+export default TeamIndex;

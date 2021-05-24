@@ -12,6 +12,120 @@ export interface paths {
       };
     };
   };
+  "/key_results": {
+    get: {
+      parameters: {
+        query: {
+          key_id?: parameters["rowFilter.key_results.key_id"];
+          key_name?: parameters["rowFilter.key_results.key_name"];
+          type?: parameters["rowFilter.key_results.type"];
+          progress?: parameters["rowFilter.key_results.progress"];
+          max_progress?: parameters["rowFilter.key_results.max_progress"];
+          key_desc?: parameters["rowFilter.key_results.key_desc"];
+          target_date?: parameters["rowFilter.key_results.target_date"];
+          added_on?: parameters["rowFilter.key_results.added_on"];
+          status?: parameters["rowFilter.key_results.status"];
+          objective_id?: parameters["rowFilter.key_results.objective_id"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["key_results"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** key_results */
+          key_results?: definitions["key_results"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          key_id?: parameters["rowFilter.key_results.key_id"];
+          key_name?: parameters["rowFilter.key_results.key_name"];
+          type?: parameters["rowFilter.key_results.type"];
+          progress?: parameters["rowFilter.key_results.progress"];
+          max_progress?: parameters["rowFilter.key_results.max_progress"];
+          key_desc?: parameters["rowFilter.key_results.key_desc"];
+          target_date?: parameters["rowFilter.key_results.target_date"];
+          added_on?: parameters["rowFilter.key_results.added_on"];
+          status?: parameters["rowFilter.key_results.status"];
+          objective_id?: parameters["rowFilter.key_results.objective_id"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          key_id?: parameters["rowFilter.key_results.key_id"];
+          key_name?: parameters["rowFilter.key_results.key_name"];
+          type?: parameters["rowFilter.key_results.type"];
+          progress?: parameters["rowFilter.key_results.progress"];
+          max_progress?: parameters["rowFilter.key_results.max_progress"];
+          key_desc?: parameters["rowFilter.key_results.key_desc"];
+          target_date?: parameters["rowFilter.key_results.target_date"];
+          added_on?: parameters["rowFilter.key_results.added_on"];
+          status?: parameters["rowFilter.key_results.status"];
+          objective_id?: parameters["rowFilter.key_results.objective_id"];
+        };
+        body: {
+          /** key_results */
+          key_results?: definitions["key_results"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
   "/notifications": {
     get: {
       parameters: {
@@ -114,6 +228,105 @@ export interface paths {
         body: {
           /** notifications */
           notifications?: definitions["notifications"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
+  "/objectives": {
+    get: {
+      parameters: {
+        query: {
+          obj_id?: parameters["rowFilter.objectives.obj_id"];
+          team_id?: parameters["rowFilter.objectives.team_id"];
+          target_date?: parameters["rowFilter.objectives.target_date"];
+          created_on?: parameters["rowFilter.objectives.created_on"];
+          obj_name?: parameters["rowFilter.objectives.obj_name"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["objectives"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** objectives */
+          objectives?: definitions["objectives"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          obj_id?: parameters["rowFilter.objectives.obj_id"];
+          team_id?: parameters["rowFilter.objectives.team_id"];
+          target_date?: parameters["rowFilter.objectives.target_date"];
+          created_on?: parameters["rowFilter.objectives.created_on"];
+          obj_name?: parameters["rowFilter.objectives.obj_name"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          obj_id?: parameters["rowFilter.objectives.obj_id"];
+          team_id?: parameters["rowFilter.objectives.team_id"];
+          target_date?: parameters["rowFilter.objectives.target_date"];
+          created_on?: parameters["rowFilter.objectives.created_on"];
+          obj_name?: parameters["rowFilter.objectives.obj_name"];
+        };
+        body: {
+          /** objectives */
+          objectives?: definitions["objectives"];
         };
         header: {
           /** Preference */
@@ -617,9 +830,46 @@ export interface paths {
       };
     };
   };
+  "/rpc/handle_notification_insert": {
+    post: {
+      parameters: {
+        body: {
+          args: { [key: string]: any };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
 }
 
 export interface definitions {
+  key_results: {
+    /**
+     * Note:
+     * This is a Primary Key.<pk/>
+     */
+    key_id: number;
+    key_name?: string;
+    type?: "PER" | "NUM" | "CUR" | "NAN";
+    progress?: number;
+    max_progress?: number;
+    key_desc?: string;
+    target_date?: string;
+    added_on?: string;
+    status?: "DUE" | "OVERDUE" | "COMPLETE";
+    /**
+     * Note:
+     * This is a Foreign Key to `objectives.obj_id`.<fk table='objectives' column='obj_id'/>
+     */
+    objective_id: number;
+  };
   notifications: {
     /**
      * Note:
@@ -651,6 +901,21 @@ export interface definitions {
     date_created: string;
     status: "PENDING" | "ACCEPTED" | "DECLINED";
     type: "REQ_TO_JOIN" | "REQ_TO_ADD" | "INFO";
+  };
+  objectives: {
+    /**
+     * Note:
+     * This is a Primary Key.<pk/>
+     */
+    obj_id: number;
+    /**
+     * Note:
+     * This is a Foreign Key to `teams.tid`.<fk table='teams' column='tid'/>
+     */
+    team_id: string;
+    target_date?: string;
+    created_on?: string;
+    obj_name?: string;
   };
   organizations: {
     /**
@@ -740,6 +1005,18 @@ export interface parameters {
   offset: string;
   /** Limiting and Pagination */
   limit: string;
+  /** key_results */
+  "body.key_results": definitions["key_results"];
+  "rowFilter.key_results.key_id": string;
+  "rowFilter.key_results.key_name": string;
+  "rowFilter.key_results.type": string;
+  "rowFilter.key_results.progress": string;
+  "rowFilter.key_results.max_progress": string;
+  "rowFilter.key_results.key_desc": string;
+  "rowFilter.key_results.target_date": string;
+  "rowFilter.key_results.added_on": string;
+  "rowFilter.key_results.status": string;
+  "rowFilter.key_results.objective_id": string;
   /** notifications */
   "body.notifications": definitions["notifications"];
   "rowFilter.notifications.nid": string;
@@ -752,6 +1029,13 @@ export interface parameters {
   "rowFilter.notifications.date_created": string;
   "rowFilter.notifications.status": string;
   "rowFilter.notifications.type": string;
+  /** objectives */
+  "body.objectives": definitions["objectives"];
+  "rowFilter.objectives.obj_id": string;
+  "rowFilter.objectives.team_id": string;
+  "rowFilter.objectives.target_date": string;
+  "rowFilter.objectives.created_on": string;
+  "rowFilter.objectives.obj_name": string;
   /** organizations */
   "body.organizations": definitions["organizations"];
   "rowFilter.organizations.oid": string;
