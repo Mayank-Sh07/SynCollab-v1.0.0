@@ -75,7 +75,7 @@ export const updateNotification = async (
 export const dateFormatRegex = (date: string) =>
   date.replace(
     /(\d{4})-(\d{1,2})-(\d{1,2})/,
-    (match, y, m, d) => d + "-" + m + "-" + y
+    (match, y, m, d) => m + "-" + d + "-" + y
   );
 
 export const truncate = (str: string, max: number, suffix: string) =>

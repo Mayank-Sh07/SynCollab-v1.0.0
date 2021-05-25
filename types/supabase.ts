@@ -862,7 +862,7 @@ export interface definitions {
     max_progress?: number;
     key_desc?: string;
     target_date?: string;
-    added_on?: string;
+    added_on: string;
     status?: "DUE" | "OVERDUE" | "COMPLETE";
     /**
      * Note:
@@ -914,7 +914,7 @@ export interface definitions {
      */
     team_id: string;
     target_date?: string;
-    created_on?: string;
+    created_on: string;
     obj_name?: string;
   };
   organizations: {

@@ -1,6 +1,8 @@
 import React from "react";
-import { Objectives, KeyResults } from "@/types/local";
+import { supabase } from "../supabase";
+import { KeyResults, NewOKR, OKRProps } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
+import { dateFormatRegex } from "@/utils/functions";
 import Loader from "./Loader";
 import {
   createStyles,
@@ -27,21 +29,7 @@ import KeyResutIcon from "@material-ui/icons/AssistantPhoto";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import SaveIcon from "@material-ui/icons/Save";
 import CancelIcon from "@material-ui/icons/Close";
-import { supabase } from "../supabase";
 import OKREditDrawer from "./OKREditDrawer";
-
-interface OKRData extends Objectives {
-  key_results: KeyResults[];
-}
-
-interface OKRProps {
-  data: OKRData;
-}
-
-interface NewOKR {
-  keyName: string;
-  date: string;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,7 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function OKR(props: OKRProps) {
   const classes = useStyles();
-  const { data } = props;
+  const { data, userRole, teamName } = props;
   const [addClicked, setAddClicked] = React.useState(false);
   const { control, handleSubmit, reset } = useForm();
   //   const data: OKRData = {
@@ -220,7 +208,9 @@ export default function OKR(props: OKRProps) {
             <Box display="flex" alignItems="center" justifyContent="flex-end">
               <Chip
                 icon={<DateIcon style={{ fontSize: 24, marginTop: 2 }} />}
-                label={data.target_date}
+                label={
+                  !data.target_date ? "----" : dateFormatRegex(data.target_date)
+                }
                 className={classes.dateChip}
               />
             </Box>
@@ -268,7 +258,11 @@ export default function OKR(props: OKRProps) {
                   </Typography>
                   <Chip
                     icon={<DateIcon style={{ fontSize: 18, marginTop: 4 }} />}
-                    label={keyResult.target_date}
+                    label={
+                      !keyResult.target_date
+                        ? "----"
+                        : dateFormatRegex(keyResult.target_date)
+                    }
                     className={classes.dateChip}
                   />
                 </Box>
@@ -279,7 +273,14 @@ export default function OKR(props: OKRProps) {
                   alignItems="center"
                   justifyContent="flex-end"
                 >
-                  <OKREditDrawer />
+                  <OKREditDrawer
+                    {...{
+                      objective: data.obj_name,
+                      teamName,
+                      ...keyResult,
+                    }}
+                    editable={userRole === "Manager"}
+                  />
                 </Box>
               </Grid>
             </Grid>
@@ -394,7 +395,7 @@ export default function OKR(props: OKRProps) {
               >
                 <AddBoxIcon className={classes.addIcon} />
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  Add a new Key result
+                  Add Key result
                 </Typography>
               </Box>
             </Grid>

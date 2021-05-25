@@ -1,6 +1,9 @@
 import React from "react";
 import clsx from "clsx";
+import DateFnsUtils from "@date-io/date-fns";
 import { supabase } from "@/supabase/index";
+import { KeyResults } from "@/types/local";
+import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { useForm, Controller } from "react-hook-form";
 import {
   createStyles,
@@ -21,8 +24,10 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import Chip from "@material-ui/core/Chip";
+import Badge from "@material-ui/core/Badge";
 
 import EditIcon from "@material-ui/icons/Edit";
+import UpdateIcon from "@material-ui/icons/RateReview";
 import CloseIcon from "@material-ui/icons/Close";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
 import KeyResutIcon from "@material-ui/icons/AssistantPhoto";
@@ -32,6 +37,9 @@ import DescriptionIcon from "@material-ui/icons/Sort";
 import TypeIcon from "@material-ui/icons/Ballot";
 import ProgressIcon from "@material-ui/icons/Assessment";
 import InfoIcon from "@material-ui/icons/Info";
+import SaveIcon from "@material-ui/icons/Save";
+import DeleteIcon from "@material-ui/icons/Delete";
+import { dateFormatRegex } from "@/utils/functions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -97,13 +105,51 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 22,
       margin: "-4px 4px 0px 0px",
     },
+    typeBtnSelected: {
+      backgroundColor: `${theme.palette.secondary.main} !important`,
+      color: `${theme.palette.common.white} !important`,
+    },
+    dateEditBadge: {
+      fontSize: 16,
+      backgroundColor: "grey",
+      padding: 2,
+      borderRadius: "16px",
+    },
+    overdue: {
+      backgroundColor: fade(theme.palette.error.main, 0.6),
+    },
+    due: {
+      backgroundColor: fade(theme.palette.info.main, 0.4),
+    },
+    actionBtn: {
+      marginRight: theme.spacing(2),
+      marginTop: theme.spacing(2),
+    },
   })
 );
 
-export default function OKREditDrawer(props: any) {
+type OKRType = KeyResults["type"];
+
+interface OKREditDrawerProps extends KeyResults {
+  objective: string | undefined;
+  teamName: string;
+  editable: boolean;
+}
+
+export default function OKREditDrawer(props: OKREditDrawerProps) {
   const classes = useStyles();
   const [state, setState] = React.useState(false);
-  const { control, handleSubmit, reset } = useForm();
+  const [type, setType] = React.useState<OKRType>(props.type);
+  const [DescEditMode, setDescEditMode] = React.useState(false);
+  const [description, setDescription] = React.useState(props.key_desc);
+  const [DateEditMode, setDateEditMode] = React.useState(false);
+  const [date, setDate] = React.useState(() => {
+    if (!props.target_date) {
+      return new Date();
+    }
+    return new Date(props.target_date);
+  });
+  const { control, handleSubmit, getValues } = useForm();
 
   const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -117,10 +163,70 @@ export default function OKREditDrawer(props: any) {
     setState(!state);
   };
 
+  const getStatusChip = (tar: KeyResults["target_date"]) => {
+    if (tar === undefined) {
+      return <></>;
+    } else if (date.getTime() >= new Date().getTime()) {
+      return (
+        <Chip variant="outlined" label="Status: Due" className={classes.due} />
+      );
+    } else {
+      return (
+        <Chip
+          variant="outlined"
+          label="Status: Overdue"
+          className={classes.overdue}
+        />
+      );
+    }
+  };
+
+  const handleDelete = async (keyId: number) => {
+    const { error } = await supabase
+      .from("key_results")
+      .delete()
+      .eq("key_id", keyId);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      setState(false);
+    }
+  };
+
+  const handleEditSubmit = async (data: any) => {
+    const edits = { ...data, type, date };
+    if (!props.editable) {
+      console.log(data);
+      console.log(edits);
+    } else {
+      const { error } = await supabase
+        .from<KeyResults>("key_results")
+        .update({
+          target_date: edits.date.toLocaleDateString(),
+          key_desc: edits.newDescription,
+          type: edits.type,
+          progress: edits.currProgress,
+          max_progress: edits.maxProgress,
+        })
+        .eq("key_id", props.key_id);
+
+      if (error) {
+        alert(error.message);
+      } else {
+        setState(false);
+      }
+    }
+  };
+
   return (
     <>
       <IconButton size="small" style={{ marginTop: 8 }} onClick={toggleDrawer}>
-        <EditIcon style={{ fontSize: 16 }} />
+        {props.editable ? (
+          <EditIcon style={{ fontSize: 16 }} />
+        ) : (
+          <UpdateIcon style={{ fontSize: 16 }} />
+        )}
       </IconButton>
       <Drawer
         anchor="right"
@@ -144,7 +250,7 @@ export default function OKREditDrawer(props: any) {
               color="textSecondary"
               style={{ fontWeight: 600 }}
             >
-              Objective statemnent here okay bro wassssaaap
+              {props.objective}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -160,22 +266,67 @@ export default function OKREditDrawer(props: any) {
           <Grid item xs={12} className={classes.flex}>
             <KeyResutIcon className={classes.decoratorKeyIcon} />
             <Typography variant="body2" noWrap style={{ fontWeight: 600 }}>
-              Key Result statemnent here okay bro wassssaaap
+              {props.key_name}
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.flex}>
             <ListItem component="div" className={classes.decoratorLI}>
               <ListItemAvatar>
-                <Avatar className={clsx(classes.listAvatar, classes.squared)}>
-                  <DateIcon style={{ color: "white" }} />
-                </Avatar>
+                {props.editable ? (
+                  <Badge
+                    overlap="rectangle"
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    badgeContent={
+                      DateEditMode ? (
+                        <CloseIcon className={classes.dateEditBadge} />
+                      ) : (
+                        <EditIcon className={classes.dateEditBadge} />
+                      )
+                    }
+                    onClick={() => {
+                      DateEditMode
+                        ? setDateEditMode(false)
+                        : setDateEditMode(true);
+                    }}
+                  >
+                    <Avatar
+                      className={clsx(classes.listAvatar, classes.squared)}
+                    >
+                      <DateIcon style={{ color: "white" }} />
+                    </Avatar>
+                  </Badge>
+                ) : (
+                  <Avatar className={clsx(classes.listAvatar, classes.squared)}>
+                    <DateIcon style={{ color: "white" }} />
+                  </Avatar>
+                )}
               </ListItemAvatar>
-              <ListItemText
-                primary="Due Date"
-                secondary="Jan 7, 2014"
-                primaryTypographyProps={{ variant: "body2" }}
-                secondaryTypographyProps={{ variant: "caption" }}
-              />
+              {DateEditMode ? (
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <DatePicker
+                    label="new date"
+                    value={date}
+                    variant="inline"
+                    size="small"
+                    autoOk
+                    invalidDateMessage={""}
+                    onChange={(date) => {
+                      !!date && setDate(new Date(date.toLocaleString()));
+                    }}
+                    onAccept={() => setDateEditMode(false)}
+                  />
+                </MuiPickersUtilsProvider>
+              ) : (
+                <ListItemText
+                  primary="Due Date"
+                  secondary={date.toLocaleDateString()}
+                  primaryTypographyProps={{ variant: "body2" }}
+                  secondaryTypographyProps={{ variant: "caption" }}
+                />
+              )}
             </ListItem>
             <ListItem component="div" className={classes.decoratorLI}>
               <ListItemAvatar>
@@ -185,7 +336,7 @@ export default function OKREditDrawer(props: any) {
               </ListItemAvatar>
               <ListItemText
                 primary="Team"
-                secondary="team name here hello bro wazzup mah nigga lolz I am is teh funny"
+                secondary={props.teamName}
                 primaryTypographyProps={{ variant: "body2" }}
                 secondaryTypographyProps={{
                   variant: "caption",
@@ -197,36 +348,113 @@ export default function OKREditDrawer(props: any) {
         </Grid>
         <form
           noValidate
-          onSubmit={handleSubmit((data: any) => console.log(data))}
+          onSubmit={handleSubmit((data: any) => handleEditSubmit(data))}
         >
           <Box margin={"4px 16px 16px"}>
-            <Box display="flex" alignItems="center">
+            <Box display="flex" alignItems="center" width={"100%"}>
               <DescriptionIcon style={{ fontSize: 22, marginRight: "4px" }} />
               <Typography variant="overline" color="textSecondary">
-                Description
+                {DescEditMode ? "Edit Description" : "Description"}
               </Typography>
+              <div style={{ flexGrow: 1 }} />
+              <div hidden={!props.editable}>
+                {DescEditMode ? (
+                  <CloseIcon
+                    className={classes.labelIcon}
+                    onClick={() => {
+                      setDescription(getValues("newDescription"));
+                      setDescEditMode(!DescEditMode);
+                    }}
+                  />
+                ) : (
+                  <EditIcon
+                    className={classes.labelIcon}
+                    onClick={() => setDescEditMode(!DescEditMode)}
+                  />
+                )}
+              </div>
             </Box>
-            <Typography variant="caption" gutterBottom>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque
-              maxime inventore minima distinctio esse ut rem atque deleniti
-              illum praesentium, tempora nisi quos veritatis dolorum. Modi
-            </Typography>
-          </Box>
-          <Box margin={"4px 16px 16px"}>
-            <Box display="flex" alignItems="center">
-              <TypeIcon className={classes.labelIcon} />
-              <Typography variant="overline" color="textSecondary" gutterBottom>
-                Type
+            {DescEditMode ? (
+              <Controller
+                name="newDescription"
+                control={control}
+                defaultValue={description}
+                rules={
+                  {
+                    //   required: "Description required",
+                  }
+                }
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <TextField
+                    label=" New Description"
+                    variant="outlined"
+                    size="small"
+                    color="secondary"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    autoFocus
+                    value={value}
+                    onChange={onChange}
+                    error={!!error}
+                    helperText={error ? error.message : null}
+                  />
+                )}
+              />
+            ) : (
+              <Typography variant="caption" gutterBottom>
+                {description}
               </Typography>
-            </Box>
-            <ButtonGroup variant="contained" color="primary">
-              <Button>%</Button>
-              <Button>#</Button>
-              <Button>₹</Button>
-              <Button>None</Button>
-            </ButtonGroup>
+            )}
           </Box>
-          <Box margin={"4px 16px 16px"}>
+          {props.editable && (
+            <Box margin={"4px 16px 16px"}>
+              <Box display="flex" alignItems="center">
+                <TypeIcon className={classes.labelIcon} />
+                <Typography
+                  variant="overline"
+                  color="textSecondary"
+                  gutterBottom
+                >
+                  Type
+                </Typography>
+              </Box>
+              <ButtonGroup variant="contained" color="primary">
+                <Button
+                  disabled={type === "PER"}
+                  onClick={() => setType("PER")}
+                  classes={{ disabled: classes.typeBtnSelected }}
+                >
+                  %
+                </Button>
+                <Button
+                  disabled={type === "NUM"}
+                  onClick={() => setType("NUM")}
+                  classes={{ disabled: classes.typeBtnSelected }}
+                >
+                  #
+                </Button>
+                <Button
+                  disabled={type === "CUR"}
+                  onClick={() => setType("CUR")}
+                  classes={{ disabled: classes.typeBtnSelected }}
+                >
+                  ₹
+                </Button>
+                <Button
+                  disabled={type === "NAN"}
+                  onClick={() => setType("NAN")}
+                  classes={{ disabled: classes.typeBtnSelected }}
+                >
+                  None
+                </Button>
+              </ButtonGroup>
+            </Box>
+          )}
+          <Box margin={"4px 16px 16px"} hidden={type === "NAN"}>
             <Box display="flex" alignItems="center">
               <ProgressIcon className={classes.labelIcon} />
               <Typography variant="overline" color="textSecondary" gutterBottom>
@@ -238,6 +466,7 @@ export default function OKREditDrawer(props: any) {
                 <Controller
                   name="currProgress"
                   control={control}
+                  defaultValue={props.progress}
                   rules={
                     {
                       //   required: "Description required",
@@ -266,6 +495,7 @@ export default function OKREditDrawer(props: any) {
                 <Controller
                   name="maxProgress"
                   control={control}
+                  defaultValue={props.max_progress}
                   rules={
                     {
                       //   required: "Description required",
@@ -281,7 +511,9 @@ export default function OKREditDrawer(props: any) {
                       size="small"
                       color="secondary"
                       fullWidth
-                      value={value}
+                      InputLabelProps={{ shrink: true }}
+                      disabled={type === "PER" || !props.editable}
+                      value={type === "PER" ? "100" : value}
                       onChange={onChange}
                       error={!!error}
                       helperText={error ? error.message : null}
@@ -291,31 +523,46 @@ export default function OKREditDrawer(props: any) {
               </Grid>
             </Grid>
           </Box>
-        </form>
-        <Box margin={"4px 14px 16px"}>
-          <Box display="flex" alignItems="center">
-            <InfoIcon className={classes.labelIcon} />
-            <Typography variant="overline" color="textSecondary" gutterBottom>
-              Info
-            </Typography>
+          <Box margin={"4px 14px 16px"}>
+            <Box display="flex" alignItems="center">
+              <InfoIcon className={classes.labelIcon} />
+              <Typography variant="overline" color="textSecondary" gutterBottom>
+                Info
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center">
+              <Typography variant="body2" style={{ marginRight: 16 }}>
+                <strong style={{ fontWeight: 600 }}>{"Created on: "}</strong>
+                {dateFormatRegex(props.added_on)}
+              </Typography>
+              {getStatusChip(props.target_date)}
+            </Box>
           </Box>
-          <Chip
-            variant="outlined"
-            label="Created on 29-12-2020"
-            className={classes.squared}
-            style={{ marginRight: 16 }}
-          />
-          <Chip
-            variant="outlined"
-            label="Status: Pending"
-            className={classes.squared}
-          />
-        </Box>
-        <Box margin={"4px 14px 16px"}>
-          <Button variant="contained" color="secondary" fullWidth>
-            {" SAVE CHANGES"}
-          </Button>
-        </Box>
+          <Box margin={"4px 14px 16px"} display="flex" alignItems="center">
+            {props.editable && (
+              <Button
+                className={classes.actionBtn}
+                variant="outlined"
+                color="secondary"
+                fullWidth
+                onClick={() => handleDelete(props.key_id)}
+                startIcon={<DeleteIcon />}
+              >
+                {"DELETE"}
+              </Button>
+            )}
+            <Button
+              className={classes.actionBtn}
+              type="submit"
+              variant="contained"
+              color="secondary"
+              fullWidth
+              startIcon={<SaveIcon />}
+            >
+              {"SAVE CHANGES"}
+            </Button>
+          </Box>
+        </form>
       </Drawer>
     </>
   );

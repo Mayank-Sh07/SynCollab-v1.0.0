@@ -243,6 +243,30 @@ export interface OrgIndexPageProps {
   error: boolean;
 }
 
+export interface OKRData extends Objectives {
+  key_results: KeyResults[];
+}
+
+export interface teamOKRData extends Teams {
+  objectives: OKRData[];
+}
+
+export interface TeamIndexProps {
+  teams: teamOKRData | undefined;
+  role: Source["role"];
+}
+
+export interface OKRProps {
+  data: OKRData;
+  teamName: string;
+  userRole: Source["role"];
+}
+
+export interface NewOKR {
+  keyName: string;
+  date: string;
+}
+
 export const title1: SectionTitleProps = {
   variant: "h3",
   align: "center",

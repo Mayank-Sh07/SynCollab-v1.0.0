@@ -2,9 +2,14 @@ import React from "react";
 import AppLayout from "@/layouts/AppLayout";
 import { GetServerSideProps } from "next";
 import { supabase } from "@/supabase/index";
+import { Source, TeamIndexProps } from "@/types/local";
+import Loader from "@/components/Loader";
 import OKR from "@/components/OKR";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+
+import AddIcon from "@material-ui/icons/AddCircle";
+import AddOKRDialog from "@/components/AddOKRDialog";
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
@@ -21,12 +26,24 @@ export const getServerSideProps: GetServerSideProps = async ({
   const orgId: number = parseInt(org_id);
   const teamId: string = team_id;
 
-  let { data, error } = await supabase
-    .from("objectives")
-    .select("*,key_results(*)")
-    .eq("team_id", teamId);
+  let { data: teams, error } = await supabase
+    .from("teams")
+    .select(`*,objectives(*,key_results(*))`)
+    .eq("tid", teamId);
 
-  return { props: { data, user, orgId } };
+  let { data: source, error: roleFetchError } = await supabase
+    .from("source")
+    .select("role")
+    .match({ uid: user.id, tid: teamId });
+  let role: Source["role"] = "Observer";
+  if (!roleFetchError && !!source) {
+    role = source.length === 0 ? "Observer" : source[0].role;
+  }
+  if (error || !teams || teams?.length === 0) {
+    console.log(error?.message);
+    return { props: {} };
+  }
+  return { props: { teams: teams[0], role } };
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -46,15 +63,25 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function TeamIndex(props: any) {
+function TeamIndex(props: TeamIndexProps) {
   const classes = useStyles();
-  const { data } = props;
+  const { teams, role } = props;
+
+  if (!teams) {
+    return <Loader isLocal={false} />;
+  }
 
   return (
     <Container className={classes.container} maxWidth={false}>
-      {data?.map((okrData: any) => (
-        <OKR data={okrData} />
+      {teams.objectives.map((okrData) => (
+        <OKR
+          data={okrData}
+          userRole={role}
+          teamName={teams.team_name}
+          key={okrData.obj_id}
+        />
       ))}
+      <AddOKRDialog teamName={teams.team_name} teamId={teams.tid} />
     </Container>
   );
 }
