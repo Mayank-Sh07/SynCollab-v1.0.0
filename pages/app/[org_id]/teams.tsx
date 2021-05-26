@@ -47,7 +47,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   let { data: Teams, error } = await supabase
     .from<TeamsData>("teams")
-    .select(`*,organizations:oid(creator_id),source(role)`)
+    .select(
+      `*,organizations:oid(creator_id),source(role),objectives(obj_id,key_results(key_id))`
+    )
     .eq("oid", orgId);
 
   const { data: orgmanagersArray } = await supabase
@@ -79,9 +81,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     mainPaper: {
       padding: theme.spacing(2),
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(4),
-      border: `1px solid ${theme.palette.primary.light}`,
       [theme.breakpoints.only("xs")]: {
         display: "flex",
         flexDirection: "column",
@@ -130,7 +129,9 @@ const fetcher = async (orgId: string) => {
   const oid = orgId.substring(6);
   let { data: Teams } = await supabase
     .from<TeamsData>("teams")
-    .select(`*,organizations:oid(creator_id),source(role)`)
+    .select(
+      `*,organizations:oid(creator_id),source(role),objectives(obj_id,key_results(key_id))`
+    )
     .eq("oid", oid);
 
   return Teams;
@@ -149,6 +150,7 @@ function TeamsPage(props: TeamsPageProps) {
       initialData: props.UserTeams,
     }
   );
+  console.log(Teams);
   const { control, handleSubmit, reset } = useForm();
   const [open, setOpen] = React.useState(false);
   const userTeamIdArray = UserTeams?.map((team) => team.id);
@@ -201,7 +203,7 @@ function TeamsPage(props: TeamsPageProps) {
   return (
     <div>
       <Container>
-        <Paper elevation={6} className={classes.mainPaper}>
+        <Paper elevation={0} className={classes.mainPaper}>
           <BoxTypography {...title1}>{"Teams"}</BoxTypography>
           <Container className={classes.teamsContainer} maxWidth={"md"}>
             <Grid container justify="space-evenly" spacing={2}>

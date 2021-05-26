@@ -14,6 +14,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 
 import SettingsIcon from "@material-ui/icons/SettingsApplications";
+import Image from "@/components/Image";
 
 export const getServerSideProps: GetServerSideProps = async ({
   req,
@@ -67,7 +68,12 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      margin: theme.spacing(3, 4, 4),
+      margin: theme.spacing(3, 4, 2),
+      paddingBottom: theme.spacing(2),
+      borderBottom: `2px solid ${theme.palette.divider}`,
+    },
+    title: {
+      fontWeight: 700,
     },
   })
 );
@@ -102,7 +108,7 @@ function TeamIndex(props: TeamIndexProps) {
   return (
     <Container className={classes.container} maxWidth={false}>
       <div className={classes.header}>
-        <Typography variant="h3" style={{ fontWeight: 700 }}>
+        <Typography variant="h3" className={classes.title}>
           {teams.team_name}
         </Typography>
         <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
@@ -111,16 +117,22 @@ function TeamIndex(props: TeamIndexProps) {
           </IconButton>
         </Link>
       </div>
-      {teams.objectives.map((okrData) => (
-        <OKR
-          data={okrData}
-          userRole={role}
-          teamName={teams.team_name}
-          key={okrData.obj_id}
-          mutate={mutate}
-          viewOnly={role === "Observer"}
-        />
-      ))}
+      {teams.objectives.length === 0 ? (
+        <div style={{ marginTop: "48px" }}>
+          <Image src="/nookr.svg" height={360} width={360} />
+        </div>
+      ) : (
+        teams.objectives.map((okrData) => (
+          <OKR
+            data={okrData}
+            userRole={role}
+            teamName={teams.team_name}
+            key={okrData.obj_id}
+            mutate={mutate}
+            viewOnly={role === "Observer"}
+          />
+        ))
+      )}
       <AddOKRDialog
         teamName={teams.team_name}
         teamId={teams.tid}

@@ -143,7 +143,7 @@ export interface NotificationInsert
 export interface NotificationUpdate
   extends Omit<Notifications, "date_created"> {}
 
-export interface TeamsData extends Teams {
+export interface TeamsData extends Teams, TeamOKRData {
   organizations: {
     creator_id: string;
     managers: string[];

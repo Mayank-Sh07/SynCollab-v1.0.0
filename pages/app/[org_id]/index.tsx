@@ -1,6 +1,8 @@
 import React from "react";
+import Router from "next/router";
 import { supabase } from "@/supabase/index";
 import { dateFormatRegex } from "@/utils/functions";
+import { useForm, Controller } from "react-hook-form";
 // Components
 import AppLayout from "@/layouts/AppLayout";
 import BoxTypography from "@/components/BoxTypography";
@@ -27,6 +29,10 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+
+import AddIcon from "@material-ui/icons/Add";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user } = await supabase.auth.api.getUserByCookie(ctx.req);
@@ -82,9 +88,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     mainPaper: {
       padding: theme.spacing(2),
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(4),
-      border: `1px solid ${theme.palette.primary.light}`,
       [theme.breakpoints.only("xs")]: {
         display: "flex",
         flexDirection: "column",
@@ -107,18 +110,54 @@ const useStyles = makeStyles((theme: Theme) =>
     adminCardContainer: {
       margin: theme.spacing(4, "auto"),
     },
+    addAdminCard: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      textAlign: "center",
+      margin: "auto",
+      padding: theme.spacing(1, 2),
+      minWidth: 180,
+      maxWidth: 200,
+      border: `1px dashed ${theme.palette.primary.main}`,
+      height: 235,
+    },
   })
 );
 
 function About(props: OrgIndexPageProps) {
   const classes = useStyles();
-  const { OrgData, AdminProfiles, TableData, error } = props;
+  const { OrgData, AdminProfiles, TableData } = props;
+  const { control, handleSubmit, reset } = useForm();
   const rows: GridRowsProp = TableData;
+
+  const handleNewAdmin = async (data: any) => {
+    let { data: profiles, error: err } = await supabase
+      .from("profiles")
+      .select("uid")
+      .eq("username", data.adminUserName);
+    if (err || !profiles || profiles?.length === 0) {
+      console.log(err);
+      alert("Unable to add Admin.");
+    } else {
+      let { error } = await supabase.rpc("add_admin", {
+        org_id: OrgData.oid,
+        user_id: profiles[0].uid,
+      });
+      if (error) {
+        alert("Error");
+        console.log(error);
+      } else {
+        reset();
+        Router.reload();
+      }
+    }
+  };
 
   return (
     <div>
       <Container>
-        <Paper elevation={6} className={classes.mainPaper}>
+        <Paper elevation={0} className={classes.mainPaper}>
           <div>
             <BoxTypography {...title1}>{OrgData.org_name}</BoxTypography>
             <BoxTypography
@@ -137,13 +176,73 @@ function About(props: OrgIndexPageProps) {
             <Container maxWidth={"md"} className={classes.adminCardContainer}>
               <Grid container justify="space-evenly" spacing={4}>
                 {!!AdminProfiles ? (
-                  AdminProfiles.map((admin) => (
-                    <AdminCard
-                      key={admin.uid}
-                      isCreator={admin.uid === OrgData.creator_id}
-                      {...admin}
-                    />
-                  ))
+                  <>
+                    {AdminProfiles.map((admin) => (
+                      <AdminCard
+                        key={admin.uid}
+                        isCreator={admin.uid === OrgData.creator_id}
+                        {...admin}
+                      />
+                    ))}
+                    <Grid item xs={12} sm={4} md={3}>
+                      <Paper
+                        elevation={3}
+                        className={classes.addAdminCard}
+                        component="form"
+                        onSubmit={handleSubmit((data) => handleNewAdmin(data))}
+                      >
+                        <BoxTypography
+                          fontWeight={600}
+                          mt={1.5}
+                          variant="h6"
+                          paragraph={false}
+                          mb={1}
+                        >
+                          NEW ADMIN
+                        </BoxTypography>
+                        <BoxTypography
+                          variant="caption"
+                          style={{ lineHeight: "1.4" }}
+                          align="center"
+                          mb={2}
+                        >
+                          Add new admins by entering their username.
+                        </BoxTypography>
+                        <Controller
+                          name="adminUserName"
+                          control={control}
+                          defaultValue=""
+                          rules={{
+                            minLength: 3,
+                          }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <TextField
+                              label="Enter Username"
+                              variant="outlined"
+                              color="secondary"
+                              fullWidth
+                              size="small"
+                              value={value}
+                              onChange={onChange}
+                              error={!!error}
+                            />
+                          )}
+                        />
+                        <Button
+                          fullWidth
+                          type="submit"
+                          color="secondary"
+                          startIcon={<AddIcon />}
+                          style={{ margin: "12px auto" }}
+                        >
+                          ADD
+                        </Button>
+                      </Paper>
+                    </Grid>
+                  </>
                 ) : (
                   <BoxTypography {...error1}>
                     Unable to load data.

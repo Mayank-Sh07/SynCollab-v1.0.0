@@ -935,7 +935,7 @@ export interface definitions {
     org_name: string;
     about_org: string;
     date_created: string;
-    managers?: string;
+    managers?: string[];
   };
   profiles: {
     /**

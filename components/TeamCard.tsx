@@ -90,13 +90,13 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
           <Grid item container direction="column" xs={2} alignItems="center">
             <ObjectivesIcon />
             <BoxTypography variant="caption" mt={-1} mb={2}>
-              xxx
+              {props.objectives.length}
             </BoxTypography>
           </Grid>
           <Grid item container direction="column" xs={2} alignItems="center">
             <ResultsIcon />
             <BoxTypography variant="caption" mt={-1} mb={2}>
-              xxx
+              {!props.objectives ? "0" : props.objectives[0].key_results.length}
             </BoxTypography>
           </Grid>
         </Grid>
@@ -126,14 +126,6 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
         )}
         <Divider className={classes.divider} />
         <div className={classes.actions}>
-          {/* <BoxTypography
-            variant="caption"
-            align="left"
-            ml="2px"
-            color="textSecondary"
-          >
-            {props.date_created}
-          </BoxTypography> */}
           <UserSearchDialog
             orgId={props.oid}
             teamId={props.tid}
