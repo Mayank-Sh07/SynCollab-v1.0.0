@@ -1,29 +1,35 @@
 import React from "react";
 import { supabase } from "@/supabase/index";
 import { dateFormatRegex, getNavData } from "@/utils/functions";
+import useSWR from "swr";
 import { useForm, Controller } from "react-hook-form";
 // Components
 import AppLayout from "@/layouts/AppLayout";
 import BoxTypography from "@/components/BoxTypography";
 import TeamCard from "@/components/TeamCard";
-import TeamCodeBox from "@/components/TeamCodeBox";
 // Types and Content
 import { GetServerSideProps } from "next";
-import { TeamsProps, TeamsData, title1, error1 } from "@/types/local";
+import {
+  TeamsPageProps,
+  TeamsData,
+  Teams,
+  title1,
+  error1,
+  Source,
+} from "@/types/local";
 // Material-UI Core
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import {
+  createStyles,
+  fade,
+  makeStyles,
+  Theme,
+} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
-import Slide from "@material-ui/core/Slide";
-import { TransitionProps } from "@material-ui/core/transitions";
 
 import AddIcon from "@material-ui/icons/Add";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -104,16 +110,47 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(3, 1, 2),
       margin: "auto",
     },
+    addTeamCard: {
+      backgroundColor: fade(theme.palette.common.white, 0.1),
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      margin: "auto",
+      marginBottom: theme.spacing(3),
+      minWidth: 275,
+      maxWidth: 300,
+      height: 300,
+      border: `2px dashed ${theme.palette.secondary.main}`,
+    },
   })
 );
 
-function Teams(props: TeamsProps) {
+const fetcher = async (orgId: string) => {
+  const oid = orgId.substring(6);
+  let { data: Teams } = await supabase
+    .from<TeamsData>("teams")
+    .select(`*,organizations:oid(creator_id),source(role)`)
+    .eq("oid", oid);
+
+  return Teams;
+};
+
+function TeamsPage(props: TeamsPageProps) {
   const classes = useStyles();
-  const { Teams, UserTeams, orgId, user, isManager, fetchError } = props;
+  const { orgId, user, isManager, fetchError } = props;
+  const { data: Teams, mutate } = useSWR("teamof" + orgId, fetcher, {
+    initialData: props.Teams,
+  });
+  const { data: UserTeams, mutate: mutateUserTeams } = useSWR(
+    [orgId, user.id],
+    getNavData,
+    {
+      initialData: props.UserTeams,
+    }
+  );
   const { control, handleSubmit, reset } = useForm();
   const [open, setOpen] = React.useState(false);
-  const [added, setAdded] = React.useState(false);
-  const [newTeamId, setTeamId] = React.useState(undefined);
   const userTeamIdArray = UserTeams?.map((team) => team.id);
 
   const handleClickOpen = () => {
@@ -122,12 +159,38 @@ function Teams(props: TeamsProps) {
 
   const handleClose = () => {
     setOpen(false);
-    setAdded(false);
-    setTeamId(undefined);
     reset();
   };
 
-  if (fetchError) {
+  const handleTeamAdd = async (data: any) => {
+    const { data: newteam, error } = await supabase
+      .from<Teams>("teams")
+      .insert([{ team_name: data.teamName, oid: orgId }]);
+
+    if (error || newteam === null) {
+      console.log(error);
+    } else if (!!newteam) {
+      const { data, error: err } = await supabase
+        .from<Source>("source")
+        .insert([
+          {
+            uid: user.id,
+            oid: orgId,
+            tid: newteam[0].tid,
+            role: "Manager",
+          },
+        ]);
+      if (err) {
+        alert(err);
+      } else {
+        mutate();
+        mutateUserTeams();
+        handleClose();
+      }
+    }
+  };
+
+  if (fetchError || !Teams) {
     return (
       <BoxTypography {...error1} color="error">
         Unable to Fetch data, Please re-load page.
@@ -138,18 +201,6 @@ function Teams(props: TeamsProps) {
   return (
     <div>
       <Container>
-        <div className={classes.pageActions}>
-          {isManager && (
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              color="secondary"
-              onClick={handleClickOpen}
-            >
-              Add Team
-            </Button>
-          )}
-        </div>
         <Paper elevation={6} className={classes.mainPaper}>
           <BoxTypography {...title1}>{"Teams"}</BoxTypography>
           <Container className={classes.teamsContainer} maxWidth={"md"}>
@@ -165,102 +216,97 @@ function Teams(props: TeamsProps) {
                   isManager={isManager}
                 />
               ))}
+              {isManager && (
+                <Grid item xs={12} sm={6} md={6} lg={4}>
+                  <Paper
+                    className={classes.addTeamCard}
+                    onClick={() => !open && handleClickOpen()}
+                  >
+                    {open ? (
+                      <form
+                        style={{ padding: "12px" }}
+                        noValidate
+                        onSubmit={handleSubmit((data) => handleTeamAdd(data))}
+                      >
+                        <BoxTypography
+                          variant="body1"
+                          fontWeight={700}
+                          align="center"
+                          mt={2}
+                          mb={1}
+                        >
+                          {"Add New Team"}
+                        </BoxTypography>
+                        <Box>
+                          <BoxTypography
+                            variant={"body2"}
+                            align="center"
+                            mt={2}
+                            mb={4}
+                          >
+                            Create a Team in jiffy. You name it, you got it!
+                          </BoxTypography>
+                          <Controller
+                            name="teamName"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                              required: "Team name required",
+                            }}
+                            render={({
+                              field: { onChange, value },
+                              fieldState: { error },
+                            }) => (
+                              <TextField
+                                label="Team Name"
+                                variant="outlined"
+                                color="secondary"
+                                fullWidth
+                                autoFocus
+                                value={value}
+                                onChange={onChange}
+                                error={!!error}
+                                helperText={error ? error.message : null}
+                              />
+                            )}
+                          />
+                        </Box>
+                        <Box mt={3} mb={2} display="flex">
+                          <Button
+                            onClick={handleClose}
+                            color="secondary"
+                            startIcon={<CancelIcon />}
+                            fullWidth
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="submit"
+                            color="secondary"
+                            startIcon={<AddIcon />}
+                            fullWidth
+                          >
+                            Create
+                          </Button>
+                        </Box>
+                      </form>
+                    ) : (
+                      <>
+                        <AddIcon style={{ fontSize: 52 }} />
+                        ADD TEAM
+                      </>
+                    )}
+                  </Paper>
+                </Grid>
+              )}
             </Grid>
           </Container>
         </Paper>
       </Container>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        PaperProps={{
-          component: "form",
-          onSubmit: handleSubmit(async (data) => {
-            const { data: newteam, error } = await supabase
-              .from("teams")
-              .insert([{ team_name: data.teamName, oid: orgId }]);
-
-            if (error) {
-              console.log(error);
-            } else {
-              !!newteam && setTeamId(newteam[0]?.tid);
-              setAdded(true);
-            }
-          }),
-        }}
-      >
-        <DialogTitle>{"Add New Team"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Create a Team in jiffy. You name it, you got it!
-          </DialogContentText>
-          <Controller
-            name="teamName"
-            control={control}
-            defaultValue=""
-            rules={{
-              required: "Team name required",
-            }}
-            render={({ field: { onChange, value }, fieldState: { error } }) => (
-              <TextField
-                label="Team Name"
-                variant="outlined"
-                color="secondary"
-                fullWidth
-                autoFocus
-                value={value}
-                onChange={onChange}
-                error={!!error}
-                helperText={error ? error.message : null}
-              />
-            )}
-          />
-          {added && (
-            <>
-              <BoxTypography mt={1} variant="caption" color="textSecondary">
-                New Team ID
-              </BoxTypography>
-              <TeamCodeBox code={newTeamId} boxProps={{ marginTop: 2 }} />
-            </>
-          )}
-        </DialogContent>
-        {added ? (
-          <DialogActions>
-            <Button
-              onClick={handleClose}
-              color="secondary"
-              startIcon={<CancelIcon />}
-            >
-              Close
-            </Button>
-          </DialogActions>
-        ) : (
-          <DialogActions>
-            <Button
-              onClick={handleClose}
-              color="secondary"
-              startIcon={<CancelIcon />}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" color="secondary" startIcon={<AddIcon />}>
-              Create
-            </Button>
-          </DialogActions>
-        )}
-      </Dialog>
     </div>
   );
 }
 
-Teams.layout = AppLayout;
+TeamsPage.layout = AppLayout;
 
-export default Teams;
-
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & { children?: React.ReactElement<any, any> },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="left" ref={ref} {...props} />;
-});
+export default TeamsPage;

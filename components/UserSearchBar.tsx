@@ -9,7 +9,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import { supabase } from "../supabase";
-import { Profiles } from "@/types/local";
+import { Profiles, SelectedUserRecords } from "@/types/local";
 import Loader from "./Loader";
 
 const fetchAllUsers = async (swrId: string) => {
@@ -21,15 +21,23 @@ const fetchAllUsers = async (swrId: string) => {
 };
 
 interface UserSearchBarProps {
-  initialUserData?: Profiles[] | undefined;
-  defaultSelected: Profiles[] | undefined;
+  initialUserData?: SelectedUserRecords[] | undefined;
+  defaultSelected?: SelectedUserRecords[] | undefined;
   setState: React.Dispatch<React.SetStateAction<Profiles[] | undefined>>;
+  fetchAll: boolean;
+  label?: string;
 }
 
 export default function UserSearchBar(props: UserSearchBarProps) {
-  const { data } = useSWR("users", fetchAllUsers, {
-    initialData: props.initialUserData,
-  });
+  let userData = undefined;
+  if (props.fetchAll) {
+    let { data } = useSWR("users", fetchAllUsers, {
+      initialData: props.initialUserData,
+    });
+    userData = data;
+  } else {
+    userData = props.initialUserData;
+  }
   const [inputValue, setInputValue] = React.useState("");
 
   const filterOptions = createFilterOptions({
@@ -37,7 +45,7 @@ export default function UserSearchBar(props: UserSearchBarProps) {
     stringify: (option: Profiles) => option.username + " " + option.email,
   });
 
-  if (!data) {
+  if (!userData) {
     return <Loader isLocal={true} />;
   }
 
@@ -46,7 +54,7 @@ export default function UserSearchBar(props: UserSearchBarProps) {
       <Autocomplete
         multiple
         limitTags={2}
-        options={data}
+        options={userData}
         filterOptions={filterOptions}
         getOptionLabel={(option) => option.username}
         noOptionsText={"No user found!"}
@@ -54,7 +62,7 @@ export default function UserSearchBar(props: UserSearchBarProps) {
           <React.Fragment>
             <ListItem alignItems="flex-start" component="div">
               <ListItemAvatar>
-                <Avatar alt="Travis Howard" style={{ marginTop: "4px" }} />
+                <Avatar style={{ marginTop: "4px" }} />
               </ListItemAvatar>
               <ListItemText
                 primaryTypographyProps={{ variant: "body2" }}
@@ -70,7 +78,7 @@ export default function UserSearchBar(props: UserSearchBarProps) {
           <TextField
             {...params}
             variant="outlined"
-            label="Add users"
+            label={props.label}
             placeholder="Search"
             color="secondary"
           />

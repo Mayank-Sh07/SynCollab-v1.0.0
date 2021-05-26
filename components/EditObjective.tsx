@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import DateFnsUtils from "@date-io/date-fns";
 import { supabase } from "@/supabase/index";
-import { KeyResults } from "@/types/local";
+import { Objectives } from "@/types/local";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -14,7 +14,6 @@ import {
 import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
@@ -23,24 +22,16 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
-import Chip from "@material-ui/core/Chip";
 import Badge from "@material-ui/core/Badge";
 
 import EditIcon from "@material-ui/icons/Edit";
-import ChevronLeft from "@material-ui/icons/ChevronLeft";
-import UpdateIcon from "@material-ui/icons/RateReview";
 import CloseIcon from "@material-ui/icons/Close";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
-import KeyResutIcon from "@material-ui/icons/AssistantPhoto";
 import DateIcon from "@material-ui/icons/DateRange";
 import TeamIcon from "@material-ui/icons/People";
 import DescriptionIcon from "@material-ui/icons/Sort";
-import TypeIcon from "@material-ui/icons/Ballot";
-import ProgressIcon from "@material-ui/icons/Assessment";
-import InfoIcon from "@material-ui/icons/Info";
 import SaveIcon from "@material-ui/icons/Save";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { dateFormatRegex } from "@/utils/functions";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -75,18 +66,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
     },
     decoratorIcon: {
-      color: theme.palette.text.secondary,
-      fontSize: 22,
+      fontSize: 30,
       margin: "1px 8px 0px 0px",
       backgroundColor: fade(theme.palette.common.white, 0.06),
-      padding: "2px",
-      borderRadius: 2,
-    },
-    decoratorKeyIcon: {
-      fontSize: 28,
-      margin: "2px 8px 0px 0px",
-      backgroundColor: fade(theme.palette.common.white, 0.06),
-      padding: "2px",
+      padding: "4px",
       borderRadius: 2,
     },
     squared: {
@@ -106,21 +89,12 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 22,
       margin: "-4px 4px 0px 0px",
     },
-    typeBtnSelected: {
-      backgroundColor: `${theme.palette.secondary.main} !important`,
-      color: `${theme.palette.common.white} !important`,
-    },
+
     dateEditBadge: {
       fontSize: 16,
       backgroundColor: "grey",
       padding: 2,
       borderRadius: "16px",
-    },
-    overdue: {
-      backgroundColor: fade(theme.palette.error.main, 0.6),
-    },
-    due: {
-      backgroundColor: fade(theme.palette.info.main, 0.4),
     },
     actionBtn: {
       marginRight: theme.spacing(2),
@@ -129,21 +103,17 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type OKRType = KeyResults["type"];
-
-interface OKREditDrawerProps extends KeyResults {
-  objective: string | undefined;
+interface OKREditDrawerProps extends Objectives {
   teamName: string;
   editable: boolean;
   mutate: any;
 }
 
-export default function OKREditDrawer(props: OKREditDrawerProps) {
+export default function EditObjective(props: OKREditDrawerProps) {
   const classes = useStyles();
   const [state, setState] = React.useState(false);
-  const [type, setType] = React.useState<OKRType>(props.type);
   const [DescEditMode, setDescEditMode] = React.useState(false);
-  const [description, setDescription] = React.useState(props.key_desc);
+  const [description, setDescription] = React.useState(props.obj_desc);
   const [DateEditMode, setDateEditMode] = React.useState(false);
   const [date, setDate] = React.useState(() => {
     if (!props.target_date) {
@@ -165,84 +135,49 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
     setState(!state);
   };
 
-  const getStatusChip = (tar: KeyResults["target_date"]) => {
-    if (tar === undefined) {
-      return <></>;
-    } else if (date.getTime() >= new Date().getTime()) {
-      return (
-        <Chip variant="outlined" label="Status: Due" className={classes.due} />
-      );
-    } else {
-      return (
-        <Chip
-          variant="outlined"
-          label="Status: Overdue"
-          className={classes.overdue}
-        />
-      );
-    }
-  };
-
-  const handleDelete = async (keyId: number) => {
+  const handleDelete = async (event: any) => {
     const { error } = await supabase
-      .from("key_results")
+      .from("objectives")
       .delete()
-      .eq("key_id", keyId);
+      .eq("obj_id", props.obj_id);
 
     if (error) {
       alert(error.message);
     } else {
-      setState(false);
       props.mutate();
+      setState(false);
     }
   };
 
   const handleEditSubmit = async (data: any) => {
-    const edits = { ...data, type, date };
-    if (!props.editable) {
-      const { error } = await supabase
-        .from<KeyResults>("key_results")
-        .update({
-          progress: edits.currProgress,
-        })
-        .eq("key_id", props.key_id);
+    const edits = { ...data, date };
+    const { error } = await supabase
+      .from<Objectives>("objectives")
+      .update({
+        obj_desc: edits.newDescription,
+        target_date: edits.date.toLocaleDateString(),
+      })
+      .eq("obj_id", props.obj_id);
 
-      if (error) {
-        alert(error.message);
-      } else {
-        setState(false);
-        props.mutate();
-      }
+    if (error) {
+      alert(error.message);
     } else {
-      const { error } = await supabase
-        .from<KeyResults>("key_results")
-        .update({
-          target_date: edits.date.toLocaleDateString(),
-          key_desc: edits.newDescription,
-          type: edits.type,
-          progress: edits.currProgress,
-          max_progress: edits.maxProgress,
-        })
-        .eq("key_id", props.key_id);
-
-      if (error) {
-        alert(error.message);
-      } else {
-        setState(false);
-        props.mutate();
-      }
+      props.mutate();
+      setState(false);
     }
   };
 
   return (
     <>
-      <IconButton size="small" style={{ marginTop: 8 }} onClick={toggleDrawer}>
-        {props.editable ? (
-          <ChevronLeft style={{ fontSize: 16 }} />
-        ) : (
-          <UpdateIcon style={{ fontSize: 16 }} />
-        )}
-      </IconButton>
+      {props.editable && (
+        <IconButton
+          size="small"
+          style={{ marginTop: 8 }}
+          onClick={toggleDrawer}
+        >
+          <EditIcon style={{ fontSize: 22 }} />
+        </IconButton>
+      )}
       <Drawer
         anchor="right"
         open={state}
@@ -260,28 +195,12 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
           <Grid item xs={12} className={classes.flex}>
             <ObjectiveIcon className={classes.decoratorIcon} />
             <Typography
-              variant="caption"
+              variant="body1"
               noWrap
-              color="textSecondary"
+              color="inherit"
               style={{ fontWeight: 600 }}
             >
-              {props.objective}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <div
-              style={{
-                height: 14,
-                width: 1,
-                margin: "2px 8px",
-                backgroundColor: "white",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} className={classes.flex}>
-            <KeyResutIcon className={classes.decoratorKeyIcon} />
-            <Typography variant="body2" noWrap style={{ fontWeight: 600 }}>
-              {props.key_name}
+              {props.obj_name}
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.flex}>
@@ -425,158 +344,31 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
               </Typography>
             )}
           </Box>
+
           {props.editable && (
-            <Box margin={"4px 16px 16px"}>
-              <Box display="flex" alignItems="center">
-                <TypeIcon className={classes.labelIcon} />
-                <Typography
-                  variant="overline"
-                  color="textSecondary"
-                  gutterBottom
-                >
-                  Type
-                </Typography>
-              </Box>
-              <ButtonGroup variant="contained" color="primary">
-                <Button
-                  disabled={type === "PER"}
-                  onClick={() => setType("PER")}
-                  classes={{ disabled: classes.typeBtnSelected }}
-                >
-                  %
-                </Button>
-                <Button
-                  disabled={type === "NUM"}
-                  onClick={() => setType("NUM")}
-                  classes={{ disabled: classes.typeBtnSelected }}
-                >
-                  #
-                </Button>
-                <Button
-                  disabled={type === "CUR"}
-                  onClick={() => setType("CUR")}
-                  classes={{ disabled: classes.typeBtnSelected }}
-                >
-                  ₹
-                </Button>
-                <Button
-                  disabled={type === "NAN"}
-                  onClick={() => setType("NAN")}
-                  classes={{ disabled: classes.typeBtnSelected }}
-                >
-                  None
-                </Button>
-              </ButtonGroup>
-            </Box>
-          )}
-          <Box margin={"4px 16px 16px"} hidden={type === "NAN"}>
-            <Box display="flex" alignItems="center">
-              <ProgressIcon className={classes.labelIcon} />
-              <Typography variant="overline" color="textSecondary" gutterBottom>
-                PROGRESS
-              </Typography>
-            </Box>
-            <Grid container spacing={2}>
-              <Grid item xs={5}>
-                <Controller
-                  name="currProgress"
-                  control={control}
-                  defaultValue={props.progress}
-                  rules={
-                    {
-                      //   required: "Description required",
-                    }
-                  }
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => (
-                    <TextField
-                      label="Current Progress"
-                      variant="outlined"
-                      size="small"
-                      color="secondary"
-                      fullWidth
-                      autoFocus
-                      value={value}
-                      onChange={onChange}
-                      error={!!error}
-                      helperText={error ? error.message : null}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={5}>
-                <Controller
-                  name="maxProgress"
-                  control={control}
-                  defaultValue={props.max_progress}
-                  rules={
-                    {
-                      //   required: "Description required",
-                    }
-                  }
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => (
-                    <TextField
-                      label="Goal"
-                      variant="outlined"
-                      size="small"
-                      color="secondary"
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      disabled={type === "PER" || !props.editable}
-                      value={type === "PER" ? "100" : value}
-                      onChange={onChange}
-                      error={!!error}
-                      helperText={error ? error.message : null}
-                    />
-                  )}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-          <Box margin={"4px 14px 16px"}>
-            <Box display="flex" alignItems="center">
-              <InfoIcon className={classes.labelIcon} />
-              <Typography variant="overline" color="textSecondary" gutterBottom>
-                Info
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center">
-              <Typography variant="body2" style={{ marginRight: 16 }}>
-                <strong style={{ fontWeight: 600 }}>{"Created on: "}</strong>
-                {dateFormatRegex(props.added_on)}
-              </Typography>
-              {getStatusChip(props.target_date)}
-            </Box>
-          </Box>
-          <Box margin={"4px 14px 16px"} display="flex" alignItems="center">
-            {props.editable && (
+            <Box margin={"4px 14px 16px"} display="flex" alignItems="center">
               <Button
                 className={classes.actionBtn}
                 variant="outlined"
                 color="secondary"
                 fullWidth
-                onClick={() => handleDelete(props.key_id)}
+                onClick={handleDelete}
                 startIcon={<DeleteIcon />}
               >
                 {"DELETE"}
               </Button>
-            )}
-            <Button
-              className={classes.actionBtn}
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              startIcon={<SaveIcon />}
-            >
-              {"SAVE CHANGES"}
-            </Button>
-          </Box>
+              <Button
+                className={classes.actionBtn}
+                type="submit"
+                variant="contained"
+                color="secondary"
+                fullWidth
+                startIcon={<SaveIcon />}
+              >
+                {"SAVE CHANGES"}
+              </Button>
+            </Box>
+          )}
         </form>
       </Drawer>
     </>

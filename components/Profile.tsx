@@ -97,7 +97,6 @@ export default function Profile(props: ProfileProps) {
       if (error) {
         console.log(error.message);
       } else {
-        console.log(data);
         return data;
       }
     }

@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface AddOKRDialogProps {
   teamName: string;
   teamId: string;
+  mutate: any;
 }
 
 export default function AddOKRDialog(props: AddOKRDialogProps) {
@@ -53,19 +54,18 @@ export default function AddOKRDialog(props: AddOKRDialogProps) {
   };
 
   const handleAdd = async (data: any) => {
-    const { error } = await supabase
-      .from<Objectives>("objectives")
-      .insert([
-        {
-          team_id: props.teamId,
-          obj_name: data.objectiveName,
-          target_date: data.date,
-        },
-      ]);
+    const { error } = await supabase.from<Objectives>("objectives").insert([
+      {
+        team_id: props.teamId,
+        obj_name: data.objectiveName,
+        target_date: data.date,
+      },
+    ]);
 
     if (error) {
       alert(error.message);
     } else {
+      props.mutate();
       handleClose();
     }
   };

@@ -2,7 +2,7 @@ import React from "react";
 import UserRoleList from "./UserRoleList";
 import BoxTypography from "./BoxTypography";
 import UserSearchBar from "./UserSearchBar";
-import { Profiles } from "@/types/local";
+import { Profiles, SelectedUserRecords } from "@/types/local";
 import { insertNotification } from "@/utils/functions";
 import {
   createStyles,
@@ -30,7 +30,8 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     addBtn: {
       borderRadius: "4px",
-      padding: "4px",
+      padding: "0px 8px",
+      fontSize: 16,
     },
     dialog: {
       height: "660px",
@@ -92,14 +93,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface SelectedUserRecords extends Profiles {
-  role?: "Manager" | "Member" | "Observer";
-}
-
 interface UserSearchDialogProps {
   uid: string;
   orgId: number;
   teamId: string;
+  teamName: string;
+  fullButton?: boolean;
 }
 
 function getSteps() {
@@ -152,6 +151,7 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
     } else {
       handleClose();
       setSelectedUsers(undefined);
+      alert("Notifications have been sent to selected users.");
     }
   };
 
@@ -171,6 +171,8 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
             <UserSearchBar
               setState={setSelectedUsers}
               defaultSelected={selectedUsers}
+              fetchAll={true}
+              label="Add Users"
             />
           </div>
         );
@@ -198,13 +200,25 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
 
   return (
     <div>
-      <IconButton
-        className={classes.addBtn}
-        size="small"
-        onClick={handleClickOpen}
-      >
-        <AddUsersIcon style={{ fontSize: 22 }} />
-      </IconButton>
+      {Boolean(props.fullButton) ? (
+        <Button
+          color="secondary"
+          fullWidth
+          variant="outlined"
+          startIcon={<AddUsersIcon />}
+          onClick={handleClickOpen}
+        >
+          Add Users
+        </Button>
+      ) : (
+        <Button
+          className={classes.addBtn}
+          startIcon={<AddUsersIcon style={{ fontSize: 22 }} />}
+          onClick={handleClickOpen}
+        >
+          Add Users
+        </Button>
+      )}
       <Dialog
         fullScreen={fullScreen}
         open={open}
@@ -221,7 +235,7 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
             fontWeight={600}
             className={classes.titleLabel}
           >
-            {"Team_name_here"}
+            {props.teamName}
           </BoxTypography>
           <div
             style={{

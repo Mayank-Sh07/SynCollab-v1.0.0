@@ -1,5 +1,5 @@
 import React from "react";
-import { Profiles } from "@/types/local";
+import { SelectedUserRecords } from "@/types/local";
 import Loader from "./Loader";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -57,15 +57,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface SelectedUserRecords extends Profiles {
-  role?: "Manager" | "Member" | "Observer";
-}
-
 interface UserRoleListProps {
   data: SelectedUserRecords[] | undefined;
   setState: React.Dispatch<
     React.SetStateAction<SelectedUserRecords[] | undefined>
   >;
+  onDelete?: (userId: string) => void;
 }
 
 export default function UserRoleList(props: UserRoleListProps) {
@@ -78,6 +75,7 @@ export default function UserRoleList(props: UserRoleListProps) {
     props.setState((prev) =>
       prev?.map((user) => {
         if (user.uid === userId) {
+          console.log("found");
           return { ...user, role: event.target.value };
         } else {
           return user;
@@ -117,7 +115,11 @@ export default function UserRoleList(props: UserRoleListProps) {
               <IconButton
                 edge="end"
                 size="small"
-                onClick={() => unselectUser(user.uid)}
+                onClick={() => {
+                  !props.onDelete
+                    ? unselectUser(user.uid)
+                    : props.onDelete(user.uid);
+                }}
               >
                 <DeleteIcon style={{ fontSize: 24 }} />
               </IconButton>

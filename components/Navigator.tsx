@@ -103,11 +103,6 @@ function Navigator(props: NavigatorProps) {
           icon: <AllTeamsIcon />,
           href: baseOrgURL + "teams",
         },
-        {
-          id: "All Goals",
-          icon: <AllGoalsIcon />,
-          href: baseOrgURL + "goals",
-        },
       ],
     },
     {
@@ -158,28 +153,34 @@ function Navigator(props: NavigatorProps) {
                 {id}
               </ListItemText>
             </ListItem>
-            {children?.map(({ id: childId, icon, href }) => (
-              <Link href={href} key={childId}>
-                <ListItem
-                  button
-                  classes={{ selected: classes.itemActiveItem }}
-                  className={clsx(classes.item)}
-                  selected={selectedItem === childId}
-                  onClick={() => handleListItemClick(childId)}
-                >
-                  <ListItemIcon className={classes.itemIcon}>
-                    {icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    classes={{
-                      primary: classes.itemPrimary,
-                    }}
+            {!children || children.length === 0 ? (
+              <ListItem style={{ fontSize: 16, fontWeight: 300 }}>
+                {"No Teams"}
+              </ListItem>
+            ) : (
+              children.map(({ id: childId, icon, href }) => (
+                <Link href={href} key={childId}>
+                  <ListItem
+                    button
+                    classes={{ selected: classes.itemActiveItem }}
+                    className={clsx(classes.item)}
+                    selected={selectedItem === childId}
+                    onClick={() => handleListItemClick(childId)}
                   >
-                    {childId}
-                  </ListItemText>
-                </ListItem>
-              </Link>
-            ))}
+                    <ListItemIcon className={classes.itemIcon}>
+                      {icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      classes={{
+                        primary: classes.itemPrimary,
+                      }}
+                    >
+                      {childId}
+                    </ListItemText>
+                  </ListItem>
+                </Link>
+              ))
+            )}
             <Divider className={classes.divider} />
           </React.Fragment>
         ))}

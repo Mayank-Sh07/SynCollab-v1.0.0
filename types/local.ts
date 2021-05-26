@@ -157,7 +157,7 @@ export interface TeamsData extends Teams {
   isManager?: boolean;
 }
 
-export interface TeamsProps {
+export interface TeamsPageProps {
   Teams: TeamsData[] | null;
   UserTeams: TeamNav[] | null;
   orgId: number;
@@ -247,19 +247,25 @@ export interface OKRData extends Objectives {
   key_results: KeyResults[];
 }
 
-export interface teamOKRData extends Teams {
+export interface TeamOKRData extends Teams {
   objectives: OKRData[];
 }
 
 export interface TeamIndexProps {
-  teams: teamOKRData | undefined;
+  teams: TeamOKRData | undefined;
   role: Source["role"];
+}
+
+export interface SelectedUserRecords extends Profiles {
+  role?: "Manager" | "Member" | "Observer";
 }
 
 export interface OKRProps {
   data: OKRData;
   teamName: string;
   userRole: Source["role"];
+  mutate: any;
+  viewOnly?: boolean;
 }
 
 export interface NewOKR {

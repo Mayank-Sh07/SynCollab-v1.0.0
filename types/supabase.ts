@@ -249,6 +249,7 @@ export interface paths {
           target_date?: parameters["rowFilter.objectives.target_date"];
           created_on?: parameters["rowFilter.objectives.created_on"];
           obj_name?: parameters["rowFilter.objectives.obj_name"];
+          obj_desc?: parameters["rowFilter.objectives.obj_desc"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -304,6 +305,7 @@ export interface paths {
           target_date?: parameters["rowFilter.objectives.target_date"];
           created_on?: parameters["rowFilter.objectives.created_on"];
           obj_name?: parameters["rowFilter.objectives.obj_name"];
+          obj_desc?: parameters["rowFilter.objectives.obj_desc"];
         };
         header: {
           /** Preference */
@@ -323,6 +325,7 @@ export interface paths {
           target_date?: parameters["rowFilter.objectives.target_date"];
           created_on?: parameters["rowFilter.objectives.created_on"];
           obj_name?: parameters["rowFilter.objectives.obj_name"];
+          obj_desc?: parameters["rowFilter.objectives.obj_desc"];
         };
         body: {
           /** objectives */
@@ -916,6 +919,7 @@ export interface definitions {
     target_date?: string;
     created_on: string;
     obj_name?: string;
+    obj_desc?: string;
   };
   organizations: {
     /**
@@ -1036,6 +1040,7 @@ export interface parameters {
   "rowFilter.objectives.target_date": string;
   "rowFilter.objectives.created_on": string;
   "rowFilter.objectives.obj_name": string;
+  "rowFilter.objectives.obj_desc": string;
   /** organizations */
   "body.organizations": definitions["organizations"];
   "rowFilter.organizations.oid": string;

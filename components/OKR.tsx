@@ -4,6 +4,7 @@ import { KeyResults, NewOKR, OKRProps } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
 import { dateFormatRegex } from "@/utils/functions";
 import Loader from "./Loader";
+import EditObjective from "./EditObjective";
 import {
   createStyles,
   fade,
@@ -22,7 +23,6 @@ import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 
-import Menu from "@material-ui/icons/MoreVert";
 import DateIcon from "@material-ui/icons/DateRange";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
 import KeyResutIcon from "@material-ui/icons/AssistantPhoto";
@@ -69,8 +69,9 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function OKR(props: OKRProps) {
   const classes = useStyles();
   const { data, userRole, teamName } = props;
+  const { key_results, ...objcetive } = data;
   const [addClicked, setAddClicked] = React.useState(false);
-  const { control, handleSubmit, reset } = useForm();
+  const { control, handleSubmit } = useForm();
   //   const data: OKRData = {
   //     obj_id: 1,
   //     team_id: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
@@ -176,6 +177,9 @@ export default function OKR(props: OKRProps) {
 
     if (error) {
       alert(error.message);
+    } else {
+      props.mutate();
+      setAddClicked(false);
     }
   };
 
@@ -217,9 +221,14 @@ export default function OKR(props: OKRProps) {
           </Grid>
           <Grid item xs={1}>
             <Box display="flex" alignItems="center" justifyContent="flex-end">
-              <IconButton size="small">
-                <Menu />
-              </IconButton>
+              {!props.viewOnly && (
+                <EditObjective
+                  {...objcetive}
+                  teamName={props.teamName}
+                  editable={userRole === "Manager"}
+                  mutate={props.mutate}
+                />
+              )}
             </Box>
           </Grid>
         </Grid>
@@ -273,14 +282,17 @@ export default function OKR(props: OKRProps) {
                   alignItems="center"
                   justifyContent="flex-end"
                 >
-                  <OKREditDrawer
-                    {...{
-                      objective: data.obj_name,
-                      teamName,
-                      ...keyResult,
-                    }}
-                    editable={userRole === "Manager"}
-                  />
+                  {!props.viewOnly && (
+                    <OKREditDrawer
+                      {...{
+                        objective: data.obj_name,
+                        teamName,
+                        ...keyResult,
+                      }}
+                      editable={userRole === "Manager"}
+                      mutate={props.mutate}
+                    />
+                  )}
                 </Box>
               </Grid>
             </Grid>

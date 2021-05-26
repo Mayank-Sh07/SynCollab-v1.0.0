@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1, 2),
       minWidth: 180,
       maxWidth: 200,
-      border: `1px solid ${theme.palette.primary.main}`,
+      border: `1px solid ${theme.palette.secondary.main}`,
       "& > *": {
         margin: theme.spacing(1),
       },

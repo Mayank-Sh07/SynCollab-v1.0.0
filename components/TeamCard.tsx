@@ -9,6 +9,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
 import Divider from "@material-ui/core/Divider";
 
 import AddIcon from "@material-ui/icons/AddBox";
@@ -16,6 +17,7 @@ import LinkIcon from "@material-ui/icons/Launch";
 import ObjectivesIcon from "@material-ui/icons/TrackChanges";
 import UsersIcon from "@material-ui/icons/People";
 import ResultsIcon from "@material-ui/icons/AssistantPhoto";
+import SettingsIcon from "@material-ui/icons/SettingsApplications";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,8 +40,12 @@ const useStyles = makeStyles((theme: Theme) =>
     actions: {
       display: "flex",
       alignItems: "center",
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
       padding: "0px 16px",
+    },
+    addBtn: {
+      borderRadius: "4px",
+      padding: "4px",
     },
   })
 );
@@ -120,19 +126,25 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
         )}
         <Divider className={classes.divider} />
         <div className={classes.actions}>
-          <BoxTypography
+          {/* <BoxTypography
             variant="caption"
             align="left"
             ml="2px"
             color="textSecondary"
           >
             {props.date_created}
-          </BoxTypography>
+          </BoxTypography> */}
           <UserSearchDialog
             orgId={props.oid}
             teamId={props.tid}
             uid={props.user.id}
+            teamName={props.team_name}
           />
+          <Link href={baseOrgURL + props.tid + "/" + "settings"}>
+            <IconButton className={classes.addBtn} size="small">
+              <SettingsIcon style={{ fontSize: 22 }} />
+            </IconButton>
+          </Link>
         </div>
       </Paper>
     </Grid>
