@@ -71,7 +71,7 @@ export default function UserAvatar() {
     router.push("/");
   };
 
-  if (user === null || userProfile === undefined) {
+  if (user === null || !userProfile) {
     return (
       <>
         <Hidden smUp>

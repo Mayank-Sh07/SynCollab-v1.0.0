@@ -1,6 +1,6 @@
 import React from "react";
 import { supabase } from "@/supabase/index";
-import { Objectives, Source, TeamIndexProps } from "@/types/local";
+import { Objectives, Profiles, Source, TeamIndexProps } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Fab from "@material-ui/core/Fab";
@@ -54,11 +54,17 @@ export default function AddOKRDialog(props: AddOKRDialogProps) {
   };
 
   const handleAdd = async (data: any) => {
+    let userProfile: Profiles | undefined = undefined;
+    if (typeof window !== "undefined") {
+      //@ts-expect-error
+      userProfile = JSON.parse(localStorage.getItem("userProfile"));
+    }
     const { error } = await supabase.from<Objectives>("objectives").insert([
       {
         team_id: props.teamId,
         obj_name: data.objectiveName,
         target_date: data.date,
+        added_by: !userProfile ? "unknown" : userProfile.username,
       },
     ]);
 

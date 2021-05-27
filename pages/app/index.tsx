@@ -85,7 +85,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     card: {
       minWidth: 275,
+      height: 290,
       border: `1px solid`,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
     },
     actionCard: {
       border: `1px solid ${theme.palette.primary.light}`,
@@ -294,6 +299,7 @@ function AppIndex(props: AppIndexProps) {
                         size="small"
                         color="secondary"
                         onClick={(event) => setOrg(event, org.id, org.name)}
+                        fullWidth
                       >
                         Enter Organization
                       </Button>
@@ -490,9 +496,9 @@ function AppIndex(props: AppIndexProps) {
       </Paper>
       <Snackbar
         open={status.open}
-        autoHideDuration={14000}
+        autoHideDuration={3000}
         onClose={() => {
-          setStatus({ open: false, success: false, message: "" });
+          setStatus({ ...status, open: false });
         }}
       >
         {status.success ? (

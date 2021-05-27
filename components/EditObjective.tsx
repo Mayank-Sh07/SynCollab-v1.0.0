@@ -269,6 +269,22 @@ export default function EditObjective(props: OKREditDrawerProps) {
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
+                primary="Added By"
+                secondary={props.added_by}
+                primaryTypographyProps={{ variant: "body2" }}
+                secondaryTypographyProps={{
+                  variant: "caption",
+                  noWrap: true,
+                }}
+              />
+            </ListItem>
+            <ListItem component="div" className={classes.decoratorLI}>
+              <ListItemAvatar>
+                <Avatar className={clsx(classes.listAvatar, classes.squared)}>
+                  <TeamIcon style={{ color: "white" }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
                 primary="Team"
                 secondary={props.teamName}
                 primaryTypographyProps={{ variant: "body2" }}

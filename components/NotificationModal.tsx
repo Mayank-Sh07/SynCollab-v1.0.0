@@ -44,7 +44,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function NotificationModal(props: any) {
   const classes = useStyles();
   let userId = props.userId;
-
   const { data: Notifications, mutate } = useSWR(userId, getNotificationData);
   const NotificationCount: number = !Notifications?.data
     ? 0
@@ -59,6 +58,12 @@ export default function NotificationModal(props: any) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  React.useEffect(() => {
+    if (NotificationCount === 0) {
+      setAnchorEl(null);
+    }
+  }, [NotificationCount]);
 
   return (
     <div>
@@ -120,6 +125,7 @@ export default function NotificationModal(props: any) {
                   avatarURL={item.profiles.avatar_url}
                   body={item.body}
                   senderId={item.sender_id}
+                  mutate={mutate}
                 />
               </div>
             ))

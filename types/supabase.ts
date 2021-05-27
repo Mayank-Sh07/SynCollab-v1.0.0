@@ -872,6 +872,7 @@ export interface definitions {
      * This is a Foreign Key to `objectives.obj_id`.<fk table='objectives' column='obj_id'/>
      */
     objective_id: number;
+    added_by: string;
   };
   notifications: {
     /**
@@ -920,6 +921,7 @@ export interface definitions {
     created_on: string;
     obj_name?: string;
     obj_desc?: string;
+    added_by: string;
   };
   organizations: {
     /**

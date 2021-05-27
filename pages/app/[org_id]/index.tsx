@@ -1,5 +1,6 @@
 import React from "react";
-import Router from "next/router";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 import { supabase } from "@/supabase/index";
 import { dateFormatRegex } from "@/utils/functions";
 import { useForm, Controller } from "react-hook-form";
@@ -31,8 +32,16 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user } = await supabase.auth.api.getUserByCookie(ctx.req);
@@ -80,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   return {
-    props: { OrgData, TableData, AdminProfiles, error: false },
+    props: { OrgData, TableData, AdminProfiles, user, error: false },
   };
 };
 
@@ -120,16 +129,40 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 180,
       maxWidth: 200,
       border: `1px dashed ${theme.palette.primary.main}`,
-      height: 235,
+      height: 250,
     },
   })
 );
 
+const fetcher = async (id: string, uidArray: string[]) => {
+  let { data: profiles, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("uid", uidArray);
+
+  if (error) {
+    console.log(error);
+  }
+  console.log(profiles);
+  return profiles;
+};
+
 function About(props: OrgIndexPageProps) {
   const classes = useStyles();
-  const { OrgData, AdminProfiles, TableData } = props;
+  const { OrgData, TableData, user } = props;
   const { control, handleSubmit, reset } = useForm();
+  const [open, setOpen] = React.useState(false);
+  const [adminsArray, setAdminsArray] = React.useState(
+    props.AdminProfiles?.map((i) => i.uid)
+  );
   const rows: GridRowsProp = TableData;
+  const router = useRouter();
+
+  const { data: AdminProfiles, mutate } = useSWR(
+    ["admins", adminsArray],
+    fetcher,
+    { initialData: props.AdminProfiles }
+  );
 
   const handleNewAdmin = async (data: any) => {
     let { data: profiles, error: err } = await supabase
@@ -140,18 +173,56 @@ function About(props: OrgIndexPageProps) {
       console.log(err);
       alert("Unable to add Admin.");
     } else {
-      let { error } = await supabase.rpc("add_admin", {
+      let { data, error } = await supabase.rpc("add_admin", {
         org_id: OrgData.oid,
         user_id: profiles[0].uid,
       });
-      if (error) {
+      if (error || !adminsArray) {
         alert("Error");
         console.log(error);
       } else {
-        reset();
-        Router.reload();
+        setAdminsArray([...adminsArray, profiles[0].uid]);
+        mutate();
+        reset({ adminUserName: "" });
       }
     }
+  };
+
+  const handleDelete = async () => {
+    const { error } = await supabase
+      .from("organizations")
+      .delete()
+      .eq("oid", OrgData.oid);
+
+    if (error) {
+      console.log(error.message);
+    } else {
+      handleClose();
+      router.push({
+        pathname: "/app/",
+      });
+    }
+  };
+
+  const handleAdminDelete = async (userId: string) => {
+    let { error } = await supabase.rpc("remove_admin", {
+      org_id: OrgData.oid,
+      user_id: userId,
+    });
+
+    if (error || !adminsArray) console.error(error);
+    else {
+      setAdminsArray(adminsArray.filter((uid) => uid !== userId));
+      mutate();
+    }
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -182,66 +253,73 @@ function About(props: OrgIndexPageProps) {
                         key={admin.uid}
                         isCreator={admin.uid === OrgData.creator_id}
                         {...admin}
+                        mutate={mutate}
+                        canDelete={user.id === OrgData.creator_id}
+                        handleAdminDelete={handleAdminDelete}
                       />
                     ))}
-                    <Grid item xs={12} sm={4} md={3}>
-                      <Paper
-                        elevation={3}
-                        className={classes.addAdminCard}
-                        component="form"
-                        onSubmit={handleSubmit((data) => handleNewAdmin(data))}
-                      >
-                        <BoxTypography
-                          fontWeight={600}
-                          mt={1.5}
-                          variant="h6"
-                          paragraph={false}
-                          mb={1}
-                        >
-                          NEW ADMIN
-                        </BoxTypography>
-                        <BoxTypography
-                          variant="caption"
-                          style={{ lineHeight: "1.4" }}
-                          align="center"
-                          mb={2}
-                        >
-                          Add new admins by entering their username.
-                        </BoxTypography>
-                        <Controller
-                          name="adminUserName"
-                          control={control}
-                          defaultValue=""
-                          rules={{
-                            minLength: 3,
-                          }}
-                          render={({
-                            field: { onChange, value },
-                            fieldState: { error },
-                          }) => (
-                            <TextField
-                              label="Enter Username"
-                              variant="outlined"
-                              color="secondary"
-                              fullWidth
-                              size="small"
-                              value={value}
-                              onChange={onChange}
-                              error={!!error}
-                            />
+                    {user.id === OrgData.creator_id && (
+                      <Grid item xs={12} sm={4} md={3}>
+                        <Paper
+                          elevation={3}
+                          className={classes.addAdminCard}
+                          component="form"
+                          onSubmit={handleSubmit((data) =>
+                            handleNewAdmin(data)
                           )}
-                        />
-                        <Button
-                          fullWidth
-                          type="submit"
-                          color="secondary"
-                          startIcon={<AddIcon />}
-                          style={{ margin: "12px auto" }}
                         >
-                          ADD
-                        </Button>
-                      </Paper>
-                    </Grid>
+                          <BoxTypography
+                            fontWeight={600}
+                            mt={1.5}
+                            variant="h6"
+                            paragraph={false}
+                            mb={1}
+                          >
+                            NEW ADMIN
+                          </BoxTypography>
+                          <BoxTypography
+                            variant="caption"
+                            style={{ lineHeight: "1.4" }}
+                            align="center"
+                            mb={2}
+                          >
+                            Add new admins by entering their username.
+                          </BoxTypography>
+                          <Controller
+                            name="adminUserName"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                              minLength: 3,
+                            }}
+                            render={({
+                              field: { onChange, value },
+                              fieldState: { error },
+                            }) => (
+                              <TextField
+                                label="Enter Username"
+                                variant="outlined"
+                                color="secondary"
+                                fullWidth
+                                size="small"
+                                value={value}
+                                onChange={onChange}
+                                error={!!error}
+                              />
+                            )}
+                          />
+                          <Button
+                            fullWidth
+                            type="submit"
+                            color="secondary"
+                            startIcon={<AddIcon />}
+                            style={{ margin: "12px auto" }}
+                          >
+                            ADD
+                          </Button>
+                        </Paper>
+                      </Grid>
+                    )}
                   </>
                 ) : (
                   <BoxTypography {...error1}>
@@ -261,6 +339,57 @@ function About(props: OrgIndexPageProps) {
           </div>
         </Paper>
       </Container>
+      {OrgData.creator_id === user.id && (
+        <>
+          <Container maxWidth="md">
+            <Alert
+              severity="error"
+              action={
+                <Button
+                  startIcon={<DeleteIcon />}
+                  color="inherit"
+                  onClick={handleClickOpen}
+                >
+                  DELETE
+                </Button>
+              }
+            >
+              <AlertTitle>Danger Zone!</AlertTitle>
+              {"Would you like to delete this Organization? —"}
+              <strong>
+                {"Clicking the 'DELETE' button will permanently delete" +
+                  OrgData.org_name +
+                  ", caution is advised."}
+              </strong>
+            </Alert>
+          </Container>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>{"Confirm Action!"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                All the data of {OrgData.org_name} will be deleted permanently!
+                Are you sure you would like to proceed?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleClose}
+                color="secondary"
+                variant="outlined"
+              >
+                Disagree
+              </Button>
+              <Button
+                onClick={handleDelete}
+                color="secondary"
+                variant="contained"
+              >
+                Agree
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </div>
   );
 }

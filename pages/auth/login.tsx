@@ -58,10 +58,7 @@ export default function LoginPage() {
   const classes = useStyles();
   const router = useRouter();
   const [status, setStatus] = useState({ open: false, success: false });
-  const { control, handleSubmit, reset } = useForm({
-    mode: "onChange",
-    defaultValues: { email: "", password: "" },
-  });
+  const { control, handleSubmit, reset } = useForm();
 
   const Login = async (data: UserCredentials): Promise<void> => {
     let { error } = await supabase.auth.signIn({
@@ -73,7 +70,7 @@ export default function LoginPage() {
       setStatus({ open: true, success: false });
       return;
     }
-    router.push("/app");
+    router.back();
   };
 
   return (
@@ -99,100 +96,101 @@ export default function LoginPage() {
             <Paper
               className={clsx(classes.paper, classes.sidePadded)}
               elevation={0}
-              component="form"
-              onSubmit={handleSubmit((data: UserCredentials) => Login(data))}
             >
-              <Grid container direction="column" spacing={2}>
-                <Grid item>
-                  <Controller
-                    name="email"
-                    control={control}
-                    defaultValue=""
-                    rules={{
-                      required: "Email address required",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
-                    }}
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <TextField
-                        label="Email Address"
-                        variant="outlined"
-                        autoComplete="email"
-                        color="secondary"
-                        fullWidth
-                        autoFocus
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <EmailIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        value={value}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
-                      />
-                    )}
-                  />
+              <form
+                noValidate
+                onSubmit={handleSubmit((data: UserCredentials) => Login(data))}
+              >
+                <Grid container direction="column" spacing={2}>
+                  <Grid item>
+                    <Controller
+                      name="email"
+                      control={control}
+                      rules={{
+                        required: "Email address required",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Invalid email address",
+                        },
+                      }}
+                      render={({
+                        field: { onChange, value, name },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          name={name}
+                          label="Email Address"
+                          variant="outlined"
+                          color="secondary"
+                          fullWidth
+                          autoFocus
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <EmailIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                          value={value}
+                          onChange={onChange}
+                          error={!!error}
+                          helperText={error ? error.message : null}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Controller
+                      name="password"
+                      control={control}
+                      rules={{
+                        required: "Password required",
+                        minLength: {
+                          value: 8,
+                          message: "Must have 8 or more characters",
+                        },
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          label="Password"
+                          variant="outlined"
+                          autoComplete="off"
+                          color="secondary"
+                          fullWidth
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <PasswordIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                          type="password"
+                          value={value}
+                          onChange={onChange}
+                          error={!!error}
+                          helperText={error ? error.message : null}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="caption" gutterBottom>
+                      {"Don't have an account? "}
+                      <Link href="/auth/signup" color="secondary">
+                        {"Create one"}
+                      </Link>
+                    </Typography>
+                  </Grid>
+                  <Grid item className={classes.centered}>
+                    <Button variant="contained" color="secondary" type="submit">
+                      Log In
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <Controller
-                    name="password"
-                    control={control}
-                    defaultValue=""
-                    rules={{
-                      required: "Password required",
-                      minLength: {
-                        value: 8,
-                        message: "Must have 8 or more characters",
-                      },
-                    }}
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <TextField
-                        label="Password"
-                        variant="outlined"
-                        autoComplete="off"
-                        color="secondary"
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <PasswordIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        type="password"
-                        value={value}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant="caption" gutterBottom>
-                    {"Don't have an account? "}
-                    <Link href="/auth/signup" color="secondary">
-                      {"Create one"}
-                    </Link>
-                  </Typography>
-                </Grid>
-                <Grid item className={classes.centered}>
-                  <Button variant="contained" color="secondary" type="submit">
-                    Log In
-                  </Button>
-                </Grid>
-              </Grid>
+              </form>
             </Paper>
           </Grid>
         </Grid>

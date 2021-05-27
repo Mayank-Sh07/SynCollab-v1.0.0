@@ -27,7 +27,6 @@ import Chip from "@material-ui/core/Chip";
 import Badge from "@material-ui/core/Badge";
 
 import EditIcon from "@material-ui/icons/Edit";
-import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import UpdateIcon from "@material-ui/icons/RateReview";
 import CloseIcon from "@material-ui/icons/Close";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
@@ -40,6 +39,7 @@ import ProgressIcon from "@material-ui/icons/Assessment";
 import InfoIcon from "@material-ui/icons/Info";
 import SaveIcon from "@material-ui/icons/Save";
 import DeleteIcon from "@material-ui/icons/Delete";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import { dateFormatRegex } from "@/utils/functions";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -236,9 +236,9 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
 
   return (
     <>
-      <IconButton size="small" style={{ marginTop: 8 }} onClick={toggleDrawer}>
+      <IconButton size="small" onClick={toggleDrawer}>
         {props.editable ? (
-          <ChevronLeft style={{ fontSize: 16 }} />
+          <EditIcon style={{ fontSize: 16 }} />
         ) : (
           <UpdateIcon style={{ fontSize: 16 }} />
         )}
@@ -342,6 +342,22 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                   secondaryTypographyProps={{ variant: "caption" }}
                 />
               )}
+            </ListItem>
+            <ListItem component="div" className={classes.decoratorLI}>
+              <ListItemAvatar>
+                <Avatar className={clsx(classes.listAvatar, classes.squared)}>
+                  <PersonAddIcon style={{ color: "white" }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary="Added By"
+                secondary={props.added_by}
+                primaryTypographyProps={{ variant: "body2" }}
+                secondaryTypographyProps={{
+                  variant: "caption",
+                  noWrap: true,
+                }}
+              />
             </ListItem>
             <ListItem component="div" className={classes.decoratorLI}>
               <ListItemAvatar>

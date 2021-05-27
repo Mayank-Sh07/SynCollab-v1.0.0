@@ -83,6 +83,9 @@ export interface AdminCardProps {
   full_name?: string;
   avatar_url?: string;
   isCreator?: boolean;
+  canDelete: boolean;
+  mutate: any;
+  handleAdminDelete: (userId: string) => Promise<void>;
 }
 
 export interface FeatureCardProps {
@@ -135,6 +138,7 @@ export interface NotificationProps {
   avatarURL: string;
   body: string;
   senderId: string;
+  mutate: any;
 }
 
 export interface NotificationInsert
@@ -241,6 +245,7 @@ export interface OrgIndexPageProps {
       }[]
     | null;
   error: boolean;
+  user: User;
 }
 
 export interface OKRData extends Objectives {

@@ -94,7 +94,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Notification(props: NotificationProps) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
-  const [hide, setHidden] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -106,7 +105,9 @@ export default function Notification(props: NotificationProps) {
     });
 
     if (error) alert(error.message);
-    else setHidden(true);
+    else {
+      props.mutate();
+    }
   };
 
   const acceptNotification = async (nid: number) => {
@@ -116,7 +117,9 @@ export default function Notification(props: NotificationProps) {
       .eq("nid", nid);
 
     if (error) alert(error.message);
-    else setHidden(true);
+    else {
+      props.mutate();
+    }
   };
 
   const declineNotification = async (nid: number) => {
@@ -126,7 +129,9 @@ export default function Notification(props: NotificationProps) {
       .eq("nid", nid);
 
     if (error) alert(error.message);
-    else setHidden(true);
+    else {
+      props.mutate();
+    }
   };
 
   const NotificationHead = () =>
@@ -153,12 +158,7 @@ export default function Notification(props: NotificationProps) {
     );
 
   return (
-    <Paper
-      square
-      elevation={6}
-      className={classes.notificationContainer}
-      hidden={hide}
-    >
+    <Paper square elevation={6} className={classes.notificationContainer}>
       <Grid container spacing={0} className={classes.bodyContainer}>
         <Grid item xs={10}>
           <Grid container direction="column">

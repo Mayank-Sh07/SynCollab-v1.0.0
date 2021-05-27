@@ -83,20 +83,22 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
         <Grid container justify="space-evenly">
           <Grid item container direction="column" xs={2} alignItems="center">
             <UsersIcon />
-            <BoxTypography variant="caption" mt={-1} mb={2}>
+            <BoxTypography variant="caption" mt={0} mb={2}>
               {props.source.length}
             </BoxTypography>
           </Grid>
           <Grid item container direction="column" xs={2} alignItems="center">
             <ObjectivesIcon />
-            <BoxTypography variant="caption" mt={-1} mb={2}>
+            <BoxTypography variant="caption" mt={0} mb={2}>
               {props.objectives.length}
             </BoxTypography>
           </Grid>
           <Grid item container direction="column" xs={2} alignItems="center">
             <ResultsIcon />
-            <BoxTypography variant="caption" mt={-1} mb={2}>
-              {!props.objectives ? "0" : props.objectives[0].key_results.length}
+            <BoxTypography variant="caption" mt={0} mb={2}>
+              {!props.objectives || props.objectives.length === 0
+                ? "0"
+                : props.objectives[0].key_results.length}
             </BoxTypography>
           </Grid>
         </Grid>
@@ -125,19 +127,28 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
           </Button>
         )}
         <Divider className={classes.divider} />
-        <div className={classes.actions}>
-          <UserSearchDialog
-            orgId={props.oid}
-            teamId={props.tid}
-            uid={props.user.id}
-            teamName={props.team_name}
-          />
-          <Link href={baseOrgURL + props.tid + "/" + "settings"}>
-            <IconButton className={classes.addBtn} size="small">
-              <SettingsIcon style={{ fontSize: 22 }} />
-            </IconButton>
-          </Link>
-        </div>
+        <Grid container justify="space-evenly" alignItems="center">
+          <Grid item xs={4}></Grid>
+          {props.isManager && (
+            <>
+              <Grid item xs={4}>
+                <UserSearchDialog
+                  orgId={props.oid}
+                  teamId={props.tid}
+                  uid={props.user.id}
+                  teamName={props.team_name}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <Link href={baseOrgURL + props.tid + "/" + "settings"}>
+                  <IconButton className={classes.addBtn} size="small">
+                    <SettingsIcon style={{ fontSize: 22 }} />
+                  </IconButton>
+                </Link>
+              </Grid>
+            </>
+          )}
+        </Grid>
       </Paper>
     </Grid>
   );

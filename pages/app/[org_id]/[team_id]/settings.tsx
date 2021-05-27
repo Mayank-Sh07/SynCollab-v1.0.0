@@ -46,6 +46,7 @@ interface TeamSettingData extends Teams {
 interface TeamSettingsProps {
   teams: TeamSettingData;
   user: User;
+  allowDelete: boolean;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -71,7 +72,12 @@ export const getServerSideProps: GetServerSideProps = async ({
     console.log(error?.message);
     return { props: {} };
   }
-  return { props: { teams: teams[0], user } };
+  let { count: teamCount } = await supabase
+    .from<Teams>("teams")
+    .select("oid", { count: "exact" })
+    .eq("oid", org_id);
+  const allowDelete: boolean = !teamCount || teamCount <= 1 ? false : true;
+  return { props: { teams: teams[0], user, allowDelete } };
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -279,27 +285,29 @@ function TeamSettings(props: TeamSettingsProps) {
             </Grid>
           </Grid>
         </Paper>
-        <Container maxWidth="sm" disableGutters>
-          <Alert
-            severity="error"
-            action={
-              <Button
-                startIcon={<DeleteIcon />}
-                color="inherit"
-                onClick={handleClickOpen}
-              >
-                DELETE
-              </Button>
-            }
-          >
-            <AlertTitle>Danger Zone!</AlertTitle>
-            Would you like to delete this Team? —{" "}
-            <strong>
-              Clicking the 'DELETE' button will permanently delete{" "}
-              {team.team_name}, caution is advised.
-            </strong>
-          </Alert>
-        </Container>
+        {props.allowDelete && (
+          <Container maxWidth="sm" disableGutters>
+            <Alert
+              severity="error"
+              action={
+                <Button
+                  startIcon={<DeleteIcon />}
+                  color="inherit"
+                  onClick={handleClickOpen}
+                >
+                  DELETE
+                </Button>
+              }
+            >
+              <AlertTitle>Danger Zone!</AlertTitle>
+              Would you like to delete this Team? —{" "}
+              <strong>
+                Clicking the 'DELETE' button will permanently delete{" "}
+                {team.team_name}, caution is advised.
+              </strong>
+            </Alert>
+          </Container>
+        )}
       </Container>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{"Confirm Action!"}</DialogTitle>

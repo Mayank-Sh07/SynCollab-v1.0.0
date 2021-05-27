@@ -25,6 +25,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import UsernameIcon from "@material-ui/icons/AccountBox";
 import MailIcon from "@material-ui/icons/Mail";
 import CloseIcon from "@material-ui/icons/Close";
+import Image from "./Image";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -237,7 +238,7 @@ export default function Profile(props: ProfileProps) {
                   </List>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                  Edit TextFields Here.
+                  <Image src="/organizations.svg" height={240} width={200} />
                 </TabPanel>
               </SwipeableViews>
             </div>

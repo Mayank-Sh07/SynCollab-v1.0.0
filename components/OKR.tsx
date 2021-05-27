@@ -1,6 +1,6 @@
 import React from "react";
 import { supabase } from "../supabase";
-import { KeyResults, NewOKR, OKRProps } from "@/types/local";
+import { KeyResults, NewOKR, OKRProps, Profiles } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
 import { dateFormatRegex } from "@/utils/functions";
 import Loader from "./Loader";
@@ -71,79 +71,12 @@ export default function OKR(props: OKRProps) {
   const { data, userRole, teamName } = props;
   const { key_results, ...objcetive } = data;
   const [addClicked, setAddClicked] = React.useState(false);
-  const { control, handleSubmit } = useForm();
-  //   const data: OKRData = {
-  //     obj_id: 1,
-  //     team_id: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-  //     created_on: "23-05-2021",
-  //     obj_name: "Completion of Objectives page and Team page.",
-  //     target_date: "25-05-2021",
-  //     keyResults: [
-  //       {
-  //         key_id: 1,
-  //         objective_id: 1,
-  //         added_on: "23-05-2021",
-  //         key_desc:
-  //           "Adding the sidebox and new pages for editing, creating and deleting OKRs",
-  //         key_name: "Add CRUD operations",
-  //         max_progress: 4,
-  //         progress: 0,
-  //         target_date: "25-05-2021",
-  //         type: "NUM",
-  //         status: "DUE",
-  //       },
-  //       {
-  //         key_id: 2,
-  //         objective_id: 1,
-  //         added_on: "24-05-2021",
-  //         key_desc: "Adding new page for editing of OKRs",
-  //         key_name: "Edit Page creation",
-  //         max_progress: 100,
-  //         progress: 0,
-  //         target_date: "25-05-2021",
-  //         type: "PER",
-  //         status: "DUE",
-  //       },
-  //     ],
-  //   };
-
-  //   const x = [
-  //     {
-  //       obj_id: 1,
-  //       team_id: "61344cbc-a1e3-4456-bb82-d6de56eea2d8",
-  //       target_date: "2021-05-25",
-  //       created_on: "2021-05-23",
-  //       obj_name: "Creation of a new world, zytopia.",
-  //       key_results: [
-  //         {
-  //           key_id: 1,
-  //           key_name: "Finding atleast 10 humans to occupy the land of Zytopia.",
-  //           type: "NUM",
-  //           progress: 0,
-  //           max_progress: 10,
-  //           key_desc:
-  //             "To use platforms such as Facebook for aliends and Instagram for monke to find inhabitants for the new world of Zytopia.",
-  //           target_date: "2021-05-24",
-  //           added_on: "2021-05-23",
-  //           status: "DUE",
-  //           objective_id: 1,
-  //         },
-  //         {
-  //           key_id: 2,
-  //           key_name: "Construction of Zytopian HQ",
-  //           type: "PER",
-  //           progress: 0,
-  //           max_progress: 100,
-  //           key_desc:
-  //             "The Zytopian HQ is being constructed by the leading universal architects from all over xenopus. This is crucial!",
-  //           target_date: "2021-05-25",
-  //           added_on: "2021-05-23",
-  //           status: "DUE",
-  //           objective_id: 1,
-  //         },
-  //       ],
-  //     },
-  //   ];
+  const { control, handleSubmit, reset } = useForm();
+  let userProfile: Profiles | undefined = undefined;
+  if (typeof window !== "undefined") {
+    //@ts-expect-error
+    userProfile = JSON.parse(localStorage.getItem("userProfile"));
+  }
 
   const progress = (
     curr: KeyResults["progress"],
@@ -167,19 +100,26 @@ export default function OKR(props: OKRProps) {
   };
 
   const addNewKeyResult = async (data: NewOKR) => {
+    let userProfile: Profiles | undefined = undefined;
+    if (typeof window !== "undefined") {
+      //@ts-expect-error
+      userProfile = JSON.parse(localStorage.getItem("userProfile"));
+    }
     const { error } = await supabase.from<KeyResults>("key_results").insert([
       {
         key_name: data.keyName,
         target_date: data.date,
         objective_id: props.data.obj_id,
+        added_by: !userProfile ? "unknown" : userProfile.username,
       },
     ]);
 
     if (error) {
       alert(error.message);
     } else {
-      props.mutate();
       setAddClicked(false);
+      reset();
+      props.mutate();
     }
   };
 
@@ -194,7 +134,7 @@ export default function OKR(props: OKRProps) {
   return (
     <List className={classes.list}>
       <ListItem id="OKR-HEAD-OBJECTIVE">
-        <Grid container>
+        <Grid container alignItems="center">
           <Grid item xs={9}>
             <Box
               maxWidth={786}
@@ -237,7 +177,7 @@ export default function OKR(props: OKRProps) {
       {data.key_results.map((keyResult) => (
         <React.Fragment key={"kr-list-item-key-" + keyResult.key_id}>
           <ListItem style={{ paddingLeft: 64 }}>
-            <Grid item container>
+            <Grid item container alignItems="center">
               <Grid item xs={8}>
                 <Box
                   maxWidth={700}
@@ -289,7 +229,11 @@ export default function OKR(props: OKRProps) {
                         teamName,
                         ...keyResult,
                       }}
-                      editable={userRole === "Manager"}
+                      editable={
+                        userRole === "Manager" ||
+                        (!!userProfile &&
+                          keyResult.added_by === userProfile.username)
+                      }
                       mutate={props.mutate}
                     />
                   )}
@@ -305,114 +249,124 @@ export default function OKR(props: OKRProps) {
           />
         </React.Fragment>
       ))}
-      {addClicked ? (
-        <ListItem className={classes.addKeyLI}>
-          <Grid
-            item
-            container
-            component="form"
-            onSubmit={handleSubmit((data: NewOKR) => addNewKeyResult(data))}
-          >
-            <Grid item xs={6}>
-              <Controller
-                name="keyName"
-                control={control}
-                rules={{
-                  required: "Description required",
-                }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
-                  <TextField
-                    label="Description"
-                    variant="outlined"
-                    size="small"
-                    color="secondary"
-                    fullWidth
-                    autoFocus
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <AddBoxIcon style={{ fontSize: 22, marginTop: 2 }} />
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={value}
-                    onChange={onChange}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={1} />
-            <Grid item xs={2}>
-              <Controller
-                name="date"
-                control={control}
-                rules={{
-                  required: "date required",
-                }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error },
-                }) => (
-                  <TextField
-                    label="Deadline"
-                    variant="outlined"
-                    size="small"
-                    color="secondary"
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    value={value}
-                    onChange={onChange}
-                    error={!!error}
-                    helperText={error ? error.message : null}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <Box display="flex" alignItems="center" justifyContent="flex-end">
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<SaveIcon />}
-                  size="small"
-                  type="submit"
-                >
-                  SAVE
-                </Button>
-                <IconButton
-                  size="small"
-                  style={{ margin: "4px 0px 0px 16px" }}
-                  onClick={handleClick}
-                >
-                  <CancelIcon />
-                </IconButton>
-              </Box>
-            </Grid>
-          </Grid>
-        </ListItem>
-      ) : (
-        <ListItem style={{ paddingLeft: 64 }} button onClick={handleClick}>
-          <Grid item container>
-            <Grid item xs={8}>
-              <Box
-                maxWidth={700}
-                display="flex"
-                alignItems="center"
-                justifyContent="flex-start"
+      {!props.viewOnly && (
+        <>
+          {addClicked ? (
+            <ListItem className={classes.addKeyLI}>
+              <Grid
+                item
+                container
+                component="form"
+                onSubmit={handleSubmit((data: NewOKR) => addNewKeyResult(data))}
               >
-                <AddBoxIcon className={classes.addIcon} />
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  Add Key result
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </ListItem>
+                <Grid item xs={6}>
+                  <Controller
+                    name="keyName"
+                    control={control}
+                    rules={{
+                      required: "Description required",
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error },
+                    }) => (
+                      <TextField
+                        label="Description"
+                        variant="outlined"
+                        size="small"
+                        color="secondary"
+                        fullWidth
+                        autoFocus
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <AddBoxIcon
+                                style={{ fontSize: 22, marginTop: 2 }}
+                              />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={1} />
+                <Grid item xs={2}>
+                  <Controller
+                    name="date"
+                    control={control}
+                    rules={{
+                      required: "date required",
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      fieldState: { error },
+                    }) => (
+                      <TextField
+                        label="Deadline"
+                        variant="outlined"
+                        size="small"
+                        color="secondary"
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-end"
+                  >
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<SaveIcon />}
+                      size="small"
+                      type="submit"
+                    >
+                      SAVE
+                    </Button>
+                    <IconButton
+                      size="small"
+                      style={{ margin: "4px 0px 0px 16px" }}
+                      onClick={handleClick}
+                    >
+                      <CancelIcon />
+                    </IconButton>
+                  </Box>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ) : (
+            <ListItem style={{ paddingLeft: 64 }} button onClick={handleClick}>
+              <Grid item container>
+                <Grid item xs={8}>
+                  <Box
+                    maxWidth={700}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                  >
+                    <AddBoxIcon className={classes.addIcon} />
+                    <Typography variant="body2" color="textSecondary" noWrap>
+                      Add Key result
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </ListItem>
+          )}
+        </>
       )}
     </List>
   );

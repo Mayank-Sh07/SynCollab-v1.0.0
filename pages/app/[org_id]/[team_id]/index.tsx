@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     console.log(error?.message);
     return { props: {} };
   }
-  return { props: { teams: teams[0], role } };
+  return { props: { teams: teams[0], role, user } };
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -111,11 +111,13 @@ function TeamIndex(props: TeamIndexProps) {
         <Typography variant="h3" className={classes.title}>
           {teams.team_name}
         </Typography>
-        <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
-          <IconButton>
-            <SettingsIcon />
-          </IconButton>
-        </Link>
+        {role === "Manager" && (
+          <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
+            <IconButton>
+              <SettingsIcon />
+            </IconButton>
+          </Link>
+        )}
       </div>
       {teams.objectives.length === 0 ? (
         <div style={{ marginTop: "48px" }}>
@@ -133,11 +135,13 @@ function TeamIndex(props: TeamIndexProps) {
           />
         ))
       )}
-      <AddOKRDialog
-        teamName={teams.team_name}
-        teamId={teams.tid}
-        mutate={mutate}
-      />
+      {role === "Manager" && (
+        <AddOKRDialog
+          teamName={teams.team_name}
+          teamId={teams.tid}
+          mutate={mutate}
+        />
+      )}
     </Container>
   );
 }
