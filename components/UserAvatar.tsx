@@ -71,7 +71,7 @@ export default function UserAvatar() {
     router.push("/");
   };
 
-  if (user === null || !userProfile) {
+  if (user === null) {
     return (
       <>
         <Hidden smUp>
@@ -98,7 +98,7 @@ export default function UserAvatar() {
 
   return (
     <>
-      <Tooltip title={userProfile.username + " | " + user.email}>
+      <Tooltip title={userProfile?.username + " | " + user.email}>
         <Avatar
           alt={userProfile?.username}
           src={userProfile?.avatar_url}
@@ -125,7 +125,7 @@ export default function UserAvatar() {
         getContentAnchorEl={null}
       >
         <div>
-          <Profile userName={userProfile.username} editable={true}>
+          <Profile userName={userProfile?.username} editable={true}>
             <MenuItem
               onClick={showProfile}
               className={classes.menuItem}

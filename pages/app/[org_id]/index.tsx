@@ -372,7 +372,7 @@ function About(props: OrgIndexPageProps) {
               }
             >
               <AlertTitle>Danger Zone!</AlertTitle>
-              {"Would you like to delete this Organization? —"}
+              {"Would you like to delete this Organization? — "}
               <strong>
                 {"Clicking the 'DELETE' button will permanently delete" +
                   OrgData.org_name +

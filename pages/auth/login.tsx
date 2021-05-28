@@ -70,7 +70,7 @@ export default function LoginPage() {
       setStatus({ open: true, success: false });
       return;
     }
-    router.back();
+    router.push("/");
   };
 
   return (

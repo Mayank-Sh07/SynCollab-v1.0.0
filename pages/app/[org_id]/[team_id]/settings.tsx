@@ -1,5 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
+import { useForm, Controller } from "react-hook-form";
 import AppLayout from "@/layouts/AppLayout";
 import useSWR from "swr";
 import BoxTypography from "@/components/BoxTypography";
@@ -32,10 +33,14 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
 import LeaveIcon from "@material-ui/icons/ExitToApp";
+import EditIcon from "@material-ui/icons/Edit";
+import DoneIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 
 interface SourceProfile extends Source {
   profiles: Profiles;
@@ -144,6 +149,8 @@ function TeamSettings(props: TeamSettingsProps) {
   const classes = useStyles();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const [renameMode, setRenameMode] = React.useState(false);
+  const [renamedTitle, setRenamedTitle] = React.useState(props.teams.team_name);
   const { teams: propTeams, user } = props;
   if (!propTeams) {
     return <Loader isLocal={false} />;
@@ -154,6 +161,7 @@ function TeamSettings(props: TeamSettingsProps) {
   if (!team) {
     return <Loader isLocal={false} />;
   }
+  const { control, handleSubmit } = useForm();
 
   const [selectedUsers, setSelectedUsers] = React.useState<
     SelectedUserRecords[] | undefined
@@ -231,6 +239,22 @@ function TeamSettings(props: TeamSettingsProps) {
         pathname: "/app/[org_id]/teams",
         query: { org_id: team.oid },
       });
+      router.reload();
+    }
+  };
+
+  const handleRename = async (data: any) => {
+    console.log(data.newTitle);
+    const { error } = await supabase
+      .from("teams")
+      .update({ team_name: data.newTitle })
+      .eq("tid", team.tid);
+    if (error) {
+      console.log(error.message);
+      alert("unable to rename Team");
+    } else {
+      mutate();
+      setRenameMode(false);
     }
   };
 
@@ -253,9 +277,64 @@ function TeamSettings(props: TeamSettingsProps) {
         >
           <BackIcon />
         </IconButton>
-        <BoxTypography {...title1} mb={4}>
-          {team.team_name}
-        </BoxTypography>
+        <div className={classes.flex} style={{ justifyContent: "center" }}>
+          {renameMode ? (
+            <form
+              noValidate
+              onSubmit={handleSubmit((data) => handleRename(data))}
+              className={classes.flex}
+              style={{ justifyContent: "center", marginBottom: "40px" }}
+            >
+              <Controller
+                name="newTitle"
+                control={control}
+                defaultValue={renamedTitle}
+                rules={{
+                  required: "New name required",
+                  minLength: 3,
+                }}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
+                  <TextField
+                    label="New team name"
+                    variant="outlined"
+                    size="small"
+                    color="secondary"
+                    fullWidth
+                    autoFocus
+                    value={value}
+                    onChange={onChange}
+                    error={!!error}
+                    helperText={error ? error.message : null}
+                  />
+                )}
+              />
+              <IconButton style={{ marginLeft: "12px" }} type="submit">
+                <DoneIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setRenameMode(false)}
+                style={{ marginLeft: "12px" }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </form>
+          ) : (
+            <>
+              <BoxTypography {...title1} mb={4}>
+                {team.team_name}
+              </BoxTypography>
+              <IconButton
+                onClick={() => setRenameMode(true)}
+                style={{ marginLeft: "12px" }}
+              >
+                <EditIcon />
+              </IconButton>
+            </>
+          )}
+        </div>
         <Paper className={classes.teamMembersContainer} variant="outlined">
           <BoxTypography {...title2}>Team Collaborators</BoxTypography>
           <UserSearchBar
@@ -362,9 +441,9 @@ function TeamSettings(props: TeamSettingsProps) {
             }
           >
             <AlertTitle>Leave this Team</AlertTitle>
-            {"Would you like to leave this Team? —"}
+            {"Would you like to leave this Team? — "}
             <strong>
-              {"Clicking the Leave button will remove you from " +
+              {"Clicking the 'LEAVE' button will remove you from " +
                 team.team_name +
                 ", caution is advised."}
             </strong>

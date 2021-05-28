@@ -35,7 +35,7 @@ interface TabPanelProps {
 }
 
 interface ProfileProps {
-  userName: string;
+  userName?: string;
   children?: React.ReactNode;
   editable?: boolean;
 }
