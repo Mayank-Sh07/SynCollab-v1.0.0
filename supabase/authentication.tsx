@@ -43,8 +43,6 @@ export const UserContextProvider = (props: Props) => {
         });
         if (event === "SIGNED_OUT") {
           localStorage.clear();
-        } else if (event === "SIGNED_IN") {
-          window.location.reload();
         }
       }
     );
