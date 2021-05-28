@@ -16,6 +16,7 @@ import {
   title2,
   Profiles,
   SelectedUserRecords,
+  subtitle1,
 } from "@/types/local";
 import Loader from "@/components/Loader";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -34,6 +35,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
+import LeaveIcon from "@material-ui/icons/ExitToApp";
 
 interface SourceProfile extends Source {
   profiles: Profiles;
@@ -47,6 +49,7 @@ interface TeamSettingsProps {
   teams: TeamSettingData;
   user: User;
   allowDelete: boolean;
+  role: Source["role"];
 }
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -77,7 +80,17 @@ export const getServerSideProps: GetServerSideProps = async ({
     .select("oid", { count: "exact" })
     .eq("oid", org_id);
   const allowDelete: boolean = !teamCount || teamCount <= 1 ? false : true;
-  return { props: { teams: teams[0], user, allowDelete } };
+
+  let { data: source, error: roleFetchError } = await supabase
+    .from("source")
+    .select("role")
+    .match({ uid: user.id, tid: teamId });
+  let role: Source["role"] = "Observer";
+  if (!roleFetchError && !!source) {
+    role = source.length === 0 ? "Observer" : source[0].role;
+  }
+
+  return { props: { teams: teams[0], user, allowDelete, role } };
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -241,7 +254,7 @@ function TeamSettings(props: TeamSettingsProps) {
           <BackIcon />
         </IconButton>
         <BoxTypography {...title1} mb={4}>
-          {"Manage " + team.team_name}
+          {team.team_name}
         </BoxTypography>
         <Paper className={classes.teamMembersContainer} variant="outlined">
           <BoxTypography {...title2}>Team Collaborators</BoxTypography>
@@ -249,6 +262,7 @@ function TeamSettings(props: TeamSettingsProps) {
             setState={setSelectedUsers}
             fetchAll={false}
             initialUserData={selectedUsers}
+            teamId={team.tid}
           />
           <UserRoleList
             data={
@@ -261,31 +275,102 @@ function TeamSettings(props: TeamSettingsProps) {
             }
             setState={setSelectedUsers}
             onDelete={handleDelete}
+            viewOnly={props.role !== "Manager"}
           />
-          <Grid container justify="space-evenly">
-            <Grid item xs={5}>
-              <UserSearchDialog
-                orgId={team.oid}
-                teamId={team.tid}
-                teamName={team.team_name}
-                uid={user.id}
-                fullButton={true}
-              />
+          {props.role === "Manager" && (
+            <Grid container justify="space-evenly">
+              <Grid item xs={5}>
+                <UserSearchDialog
+                  orgId={team.oid}
+                  teamId={team.tid}
+                  teamName={team.team_name}
+                  uid={user.id}
+                  fullButton={true}
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  disabled={changesMade.length === 0}
+                  color="secondary"
+                  onClick={handleChanges}
+                >
+                  Save Changes
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={5}>
-              <Button
-                variant="contained"
-                fullWidth
-                disabled={changesMade.length === 0}
-                color="secondary"
-                onClick={handleChanges}
-              >
-                Save Changes
-              </Button>
-            </Grid>
-          </Grid>
+          )}
+          <BoxTypography {...title2} mt={6}>
+            Collaborator Roles
+          </BoxTypography>
+          <BoxTypography {...subtitle1} align="justify">
+            <strong style={{ color: "white", fontSize: "24px" }}>
+              {"Manager "}
+            </strong>
+            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
+            suscipit est blanditiis dolore magni a voluptate exercitationem!
+            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
+            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
+            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
+            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+          </BoxTypography>
+          <BoxTypography {...subtitle1} align="justify">
+            <strong style={{ color: "white", fontSize: "24px" }}>
+              {"Member "}
+            </strong>
+            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
+            suscipit est blanditiis dolore magni a voluptate exercitationem!
+            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
+            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
+            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
+            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+          </BoxTypography>
+          <BoxTypography {...subtitle1} align="justify">
+            <strong style={{ color: "white", fontSize: "24px" }}>
+              {"Observer "}
+            </strong>
+            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
+            suscipit est blanditiis dolore magni a voluptate exercitationem!
+            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
+            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
+            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
+            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+          </BoxTypography>
         </Paper>
-        {props.allowDelete && (
+        <Container
+          maxWidth="sm"
+          disableGutters
+          style={{ marginBottom: "32px" }}
+        >
+          <Alert
+            severity="warning"
+            action={
+              <Button
+                startIcon={<LeaveIcon />}
+                color="inherit"
+                onClick={() => {
+                  handleDelete(user.id);
+                  router.push({
+                    pathname: "/app/[org_id]/teams",
+                    query: { org_id: team.oid },
+                  });
+                }}
+              >
+                LEAVE
+              </Button>
+            }
+          >
+            <AlertTitle>Leave this Team</AlertTitle>
+            {"Would you like to leave this Team? —"}
+            <strong>
+              {"Clicking the Leave button will remove you from " +
+                team.team_name +
+                ", caution is advised."}
+            </strong>
+          </Alert>
+        </Container>
+        {props.allowDelete && props.role === "Manager" && (
           <Container maxWidth="sm" disableGutters>
             <Alert
               severity="error"

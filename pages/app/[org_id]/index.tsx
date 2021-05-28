@@ -24,6 +24,7 @@ import {
   title2,
   subtitle1,
   error1,
+  Source,
 } from "@/types/local";
 // Material-UI Core
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -204,6 +205,22 @@ function About(props: OrgIndexPageProps) {
     }
   };
 
+  const handleOrgLeave = async () => {
+    const { error } = await supabase
+      .from<Source>("source")
+      .delete()
+      .match({ oid: OrgData.oid.toString(), uid: user.id });
+
+    if (error) {
+      console.log(error.message);
+    } else {
+      handleClose();
+      router.push({
+        pathname: "/app/",
+      });
+    }
+  };
+
   const handleAdminDelete = async (userId: string) => {
     let { error } = await supabase.rpc("remove_admin", {
       org_id: OrgData.oid,
@@ -339,7 +356,7 @@ function About(props: OrgIndexPageProps) {
           </div>
         </Paper>
       </Container>
-      {OrgData.creator_id === user.id && (
+      {OrgData.creator_id === user.id ? (
         <>
           <Container maxWidth="md">
             <Alert
@@ -368,6 +385,7 @@ function About(props: OrgIndexPageProps) {
             <DialogContent>
               <DialogContentText>
                 All the data of {OrgData.org_name} will be deleted permanently!
+                <br />
                 Are you sure you would like to proceed?
               </DialogContentText>
             </DialogContent>
@@ -381,6 +399,57 @@ function About(props: OrgIndexPageProps) {
               </Button>
               <Button
                 onClick={handleDelete}
+                color="secondary"
+                variant="contained"
+              >
+                Agree
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      ) : (
+        <>
+          <Container maxWidth="md">
+            <Alert
+              severity="error"
+              action={
+                <Button
+                  startIcon={<DeleteIcon />}
+                  color="inherit"
+                  onClick={handleClickOpen}
+                >
+                  Leave
+                </Button>
+              }
+            >
+              <AlertTitle>Leave Organization</AlertTitle>
+              {"Would you like to leave this Organization? —"}
+              <strong>
+                {"Clicking the 'Leave' button will remove you from " +
+                  OrgData.org_name +
+                  " as well as all the Teams, caution is advised."}
+              </strong>
+            </Alert>
+          </Container>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>{"Confirm Action!"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                You will be removed from {OrgData.org_name} and all its Teams.
+                <br />
+                Are you sure you would like to proceed?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleClose}
+                color="secondary"
+                variant="outlined"
+              >
+                Disagree
+              </Button>
+              <Button
+                onClick={handleOrgLeave}
                 color="secondary"
                 variant="contained"
               >

@@ -9,13 +9,24 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import { supabase } from "../supabase";
-import { Profiles, SelectedUserRecords } from "@/types/local";
+import { Profiles, SelectedUserRecords, Source } from "@/types/local";
 import Loader from "./Loader";
 
-const fetchAllUsers = async (swrId: string) => {
+const fetchAllUsers = async (swrId: string, teamId: string) => {
   let { data: profiles } = await supabase
     .from<Profiles>("profiles")
     .select("*");
+
+  let { data: teamUsers } = await supabase
+    .from<Source>("source")
+    .select("uid")
+    .eq("tid", teamId);
+
+  if (!!teamUsers && !!profiles) {
+    const uidArr = teamUsers.map((u) => u.uid);
+    let users = profiles.filter((p) => !uidArr.includes(p.uid));
+    return users;
+  }
 
   return profiles;
 };
@@ -26,14 +37,13 @@ interface UserSearchBarProps {
   setState: React.Dispatch<React.SetStateAction<Profiles[] | undefined>>;
   fetchAll: boolean;
   label?: string;
+  teamId: string;
 }
 
 export default function UserSearchBar(props: UserSearchBarProps) {
   let userData = undefined;
   if (props.fetchAll) {
-    let { data } = useSWR("users", fetchAllUsers, {
-      initialData: props.initialUserData,
-    });
+    let { data } = useSWR(["users", props.teamId], fetchAllUsers);
     userData = data;
   } else {
     userData = props.initialUserData;

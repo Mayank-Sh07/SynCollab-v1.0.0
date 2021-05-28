@@ -111,15 +111,13 @@ function TeamIndex(props: TeamIndexProps) {
         <Typography variant="h3" className={classes.title}>
           {teams.team_name}
         </Typography>
-        {role === "Manager" && (
-          <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
-            <IconButton>
-              <SettingsIcon />
-            </IconButton>
-          </Link>
-        )}
+        <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
+          <IconButton>
+            <SettingsIcon />
+          </IconButton>
+        </Link>
       </div>
-      {teams.objectives.length === 0 ? (
+      {teams.objectives.length === 0 || !teams.objectives ? (
         <div style={{ marginTop: "48px" }}>
           <Image src="/nookr.svg" height={360} width={360} />
         </div>

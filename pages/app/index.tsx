@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
     },
     gridContainer: {
-      marginTop: theme.spacing(1),
+      marginTop: theme.spacing(4),
       marginBottom: theme.spacing(2),
     },
     card: {
@@ -89,11 +89,11 @@ const useStyles = makeStyles((theme: Theme) =>
       border: `1px solid`,
       display: "flex",
       flexDirection: "column",
+      position: "relative",
       alignItems: "center",
-      justifyContent: "center",
     },
     actionCard: {
-      border: `1px solid ${theme.palette.primary.light}`,
+      border: `1px solid ${theme.palette.secondary.light}`,
       minHeight: 680,
       display: "flex",
       flexDirection: "column",
@@ -298,8 +298,15 @@ function AppIndex(props: AppIndexProps) {
                       <Button
                         size="small"
                         color="secondary"
+                        variant="contained"
                         onClick={(event) => setOrg(event, org.id, org.name)}
-                        fullWidth
+                        style={{
+                          position: "absolute",
+                          bottom: "8px",
+                          left: "8px",
+                          width: 260,
+                          margin: "auto",
+                        }}
                       >
                         Enter Organization
                       </Button>

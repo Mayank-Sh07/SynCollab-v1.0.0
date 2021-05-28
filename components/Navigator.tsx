@@ -16,14 +16,15 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
 import Link from "@/components/Link";
 
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
 import OrganizationsIcon from "@material-ui/icons/DynamicFeed";
-import AllGoalsIcon from "@material-ui/icons/DataUsage";
 import AllTeamsIcon from "@material-ui/icons/Category";
 import DnsRoundedIcon from "@material-ui/icons/DnsRounded";
 import AboutIcon from "@material-ui/icons/EmojiObjects";
+import PublishIcon from "@material-ui/icons/Publish";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -144,47 +145,69 @@ function Navigator(props: NavigatorProps) {
         </Link>
         {categories.map(({ id, children }) => (
           <React.Fragment key={id}>
-            <ListItem className={classes.categoryHeader}>
-              <ListItemText
-                classes={{
-                  primary: classes.categoryHeaderPrimary,
-                }}
-              >
-                {id}
-              </ListItemText>
-            </ListItem>
-            {!children || children.length === 0 ? (
-              <ListItem style={{ fontSize: 16, fontWeight: 300 }}>
-                {"No Teams"}
+            <div style={{ maxHeight: 270, overflowY: "auto" }}>
+              <ListItem className={classes.categoryHeader}>
+                <ListItemText
+                  classes={{
+                    primary: classes.categoryHeaderPrimary,
+                  }}
+                >
+                  {id}
+                </ListItemText>
               </ListItem>
-            ) : (
-              children.map(({ id: childId, icon, href }) => (
-                <Link href={href} key={childId}>
-                  <ListItem
-                    button
-                    classes={{ selected: classes.itemActiveItem }}
-                    className={clsx(classes.item)}
-                    selected={selectedItem === childId}
-                    onClick={() => handleListItemClick(childId)}
-                  >
-                    <ListItemIcon className={classes.itemIcon}>
-                      {icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      classes={{
-                        primary: classes.itemPrimary,
-                      }}
+              {!children || children.length === 0 ? (
+                <ListItem style={{ fontSize: 16, fontWeight: 300 }}>
+                  {"No Teams"}
+                </ListItem>
+              ) : (
+                children.map(({ id: childId, icon, href }) => (
+                  <Link href={href} key={childId}>
+                    <ListItem
+                      button
+                      classes={{ selected: classes.itemActiveItem }}
+                      className={clsx(classes.item)}
+                      selected={selectedItem === childId}
+                      onClick={() => handleListItemClick(childId)}
                     >
-                      {childId}
-                    </ListItemText>
-                  </ListItem>
-                </Link>
-              ))
-            )}
-            <Divider className={classes.divider} />
+                      <ListItemIcon className={classes.itemIcon}>
+                        {icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        classes={{
+                          primary: classes.itemPrimary,
+                        }}
+                      >
+                        {childId}
+                      </ListItemText>
+                    </ListItem>
+                  </Link>
+                ))
+              )}
+            </div>
+            <Divider className={classes.divider} style={{ marginTop: "8px" }} />
           </React.Fragment>
         ))}
       </List>
+
+      <Link
+        href="/pricing"
+        style={{
+          position: "absolute",
+          bottom: "6px",
+          display: "flex",
+          width: "100%",
+          padding: "10px",
+        }}
+      >
+        <Button
+          variant="contained"
+          color="secondary"
+          endIcon={<PublishIcon />}
+          fullWidth
+        >
+          FREE PLAN
+        </Button>
+      </Link>
     </Drawer>
   );
 }

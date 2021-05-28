@@ -219,7 +219,7 @@ export interface OrgIndexPageData {
 
 export interface OrgIndexPageProps {
   OrgData: {
-    oid?: number;
+    oid: number;
     creator_id: string;
     org_name: string;
     about_org: string;

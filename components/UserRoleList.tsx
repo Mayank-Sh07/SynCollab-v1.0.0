@@ -63,6 +63,7 @@ interface UserRoleListProps {
     React.SetStateAction<SelectedUserRecords[] | undefined>
   >;
   onDelete?: (userId: string) => void;
+  viewOnly: boolean;
 }
 
 export default function UserRoleList(props: UserRoleListProps) {
@@ -112,17 +113,19 @@ export default function UserRoleList(props: UserRoleListProps) {
               secondaryTypographyProps={{ noWrap: true }}
             />
             <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                size="small"
-                onClick={() => {
-                  !props.onDelete
-                    ? unselectUser(user.uid)
-                    : props.onDelete(user.uid);
-                }}
-              >
-                <DeleteIcon style={{ fontSize: 24 }} />
-              </IconButton>
+              {!props.viewOnly && (
+                <IconButton
+                  edge="end"
+                  size="small"
+                  onClick={() => {
+                    !props.onDelete
+                      ? unselectUser(user.uid)
+                      : props.onDelete(user.uid);
+                  }}
+                >
+                  <DeleteIcon style={{ fontSize: 24 }} />
+                </IconButton>
+              )}
             </ListItemSecondaryAction>
           </ListItem>
           <TextField
@@ -131,6 +134,7 @@ export default function UserRoleList(props: UserRoleListProps) {
             onChange={(e) => handleChange(e, user.uid)}
             color="secondary"
             size="small"
+            disabled={props.viewOnly}
             defaultValue={"Observer"}
             className={classes.select}
           >

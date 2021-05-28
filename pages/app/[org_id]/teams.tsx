@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(3),
       minWidth: 275,
       maxWidth: 300,
-      height: 300,
+      height: 305,
       border: `2px dashed ${theme.palette.secondary.main}`,
     },
   })

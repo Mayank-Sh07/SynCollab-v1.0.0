@@ -119,6 +119,7 @@ export default function Notification(props: NotificationProps) {
     if (error) alert(error.message);
     else {
       props.mutate();
+      window.location.reload();
     }
   };
 

@@ -173,6 +173,7 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
               defaultSelected={selectedUsers}
               fetchAll={true}
               label="Add Users"
+              teamId={props.teamId}
             />
           </div>
         );
@@ -189,7 +190,11 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
                 ? "No users selected"
                 : "Assign roles to each user"}
             </BoxTypography>
-            <UserRoleList data={selectedUsers} setState={setSelectedUsers} />
+            <UserRoleList
+              data={selectedUsers}
+              setState={setSelectedUsers}
+              viewOnly={false}
+            />
           </div>
         );
 
@@ -208,7 +213,7 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
           startIcon={<AddUsersIcon />}
           onClick={handleClickOpen}
         >
-          Add Users
+          Add
         </Button>
       ) : (
         <Button
@@ -216,7 +221,7 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
           startIcon={<AddUsersIcon style={{ fontSize: 22 }} />}
           onClick={handleClickOpen}
         >
-          Add Users
+          Add
         </Button>
       )}
       <Dialog
