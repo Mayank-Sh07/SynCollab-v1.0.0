@@ -1,8 +1,0 @@
-General:
-npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/supabase.ts
-
-For Syncollab:
-npx openapi-typescript https://xenyesyjwbsjvfztjbng.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNjQxMjE5NywiZXhwIjoxOTMxOTg4MTk3fQ.nSe1sXutQrBRefrGHEvnvw7mANLeKcCTO25MVtmb8Rc --output types/supabase.ts
-
-For Syncollab-Production:
-npx openapi-typescript https://bcqincllvupgnvfhfldh.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxOTg1NzcwOCwiZXhwIjoxOTM1NDMzNzA4fQ.YRYiFpLIvlP-e9R0gvDIoo3_cWA1qcjThLARVrfE_58 --output types/supabase.ts
