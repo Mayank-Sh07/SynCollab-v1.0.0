@@ -18,6 +18,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import Link from "@/components/Link";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
 import OrganizationsIcon from "@material-ui/icons/DynamicFeed";
@@ -120,14 +121,16 @@ function Navigator(props: NavigatorProps) {
     <Drawer variant="permanent" {...other}>
       <List disablePadding>
         <Link href="/">
-          <ListItem
-            className={clsx(classes.base, classes.item, classes.itemCategory)}
-          >
-            <ListItemIcon className={classes.itemIcon}>
-              <BackIcon />
-            </ListItemIcon>
-            SynCollab
-          </ListItem>
+          <Tooltip title="Back to Home">
+            <ListItem
+              className={clsx(classes.base, classes.item, classes.itemCategory)}
+            >
+              <ListItemIcon className={classes.itemIcon}>
+                <BackIcon />
+              </ListItemIcon>
+              SynCollab
+            </ListItem>
+          </Tooltip>
         </Link>
         <Link href="/app">
           <ListItem className={clsx(classes.item, classes.itemCategory)}>
@@ -188,7 +191,6 @@ function Navigator(props: NavigatorProps) {
           </React.Fragment>
         ))}
       </List>
-
       <Link
         href="/pricing"
         style={{
@@ -199,14 +201,16 @@ function Navigator(props: NavigatorProps) {
           padding: "10px",
         }}
       >
-        <Button
-          variant="contained"
-          color="secondary"
-          endIcon={<PublishIcon />}
-          fullWidth
-        >
-          FREE PLAN
-        </Button>
+        <Tooltip title="Checkout Plans">
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<PublishIcon />}
+            fullWidth
+          >
+            FREE PLAN
+          </Button>
+        </Tooltip>
       </Link>
     </Drawer>
   );

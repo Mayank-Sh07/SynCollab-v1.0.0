@@ -1,10 +1,9 @@
 import React from "react";
 import clsx from "clsx";
-import DateFnsUtils from "@date-io/date-fns";
 import { supabase } from "@/supabase/index";
 import { Objectives } from "@/types/local";
-import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { useForm, Controller } from "react-hook-form";
+import { dateFormatRegex } from "@/utils/functions";
 import {
   createStyles,
   fade,
@@ -23,6 +22,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import Badge from "@material-ui/core/Badge";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import EditIcon from "@material-ui/icons/Edit";
 import CloseIcon from "@material-ui/icons/Close";
@@ -115,12 +115,9 @@ export default function EditObjective(props: OKREditDrawerProps) {
   const [DescEditMode, setDescEditMode] = React.useState(false);
   const [description, setDescription] = React.useState(props.obj_desc);
   const [DateEditMode, setDateEditMode] = React.useState(false);
-  const [date, setDate] = React.useState(() => {
-    if (!props.target_date) {
-      return new Date();
-    }
-    return new Date(props.target_date);
-  });
+  const [date, setDate] = React.useState(
+    !props.target_date ? new Date().toISOString() : props.target_date
+  );
   const { control, handleSubmit, getValues } = useForm();
 
   const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -155,7 +152,7 @@ export default function EditObjective(props: OKREditDrawerProps) {
       .from<Objectives>("objectives")
       .update({
         obj_desc: edits.newDescription,
-        target_date: edits.date.toLocaleDateString(),
+        target_date: edits.date,
       })
       .eq("obj_id", props.obj_id);
 
@@ -170,13 +167,15 @@ export default function EditObjective(props: OKREditDrawerProps) {
   return (
     <>
       {props.editable && (
-        <IconButton
-          size="small"
-          style={{ marginTop: 8 }}
-          onClick={toggleDrawer}
-        >
-          <EditIcon style={{ fontSize: 22 }} />
-        </IconButton>
+        <Tooltip title="Edit Objective">
+          <IconButton
+            size="small"
+            style={{ marginTop: 8 }}
+            onClick={toggleDrawer}
+          >
+            <EditIcon style={{ fontSize: 22 }} />
+          </IconButton>
+        </Tooltip>
       )}
       <Drawer
         anchor="right"
@@ -198,7 +197,7 @@ export default function EditObjective(props: OKREditDrawerProps) {
               variant="body1"
               noWrap
               color="inherit"
-              style={{ fontWeight: 600 }}
+              style={{ fontWeight: 600, maxWidth: 400 }}
             >
               {props.obj_name}
             </Typography>
@@ -239,24 +238,22 @@ export default function EditObjective(props: OKREditDrawerProps) {
                 )}
               </ListItemAvatar>
               {DateEditMode ? (
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <DatePicker
-                    label="new date"
-                    value={date}
-                    variant="inline"
-                    size="small"
-                    autoOk
-                    invalidDateMessage={""}
-                    onChange={(date) => {
-                      !!date && setDate(new Date(date.toLocaleString()));
-                    }}
-                    onAccept={() => setDateEditMode(false)}
-                  />
-                </MuiPickersUtilsProvider>
+                <TextField
+                  name="newDate"
+                  type="date"
+                  size="small"
+                  onChange={(e) => {
+                    setDate(dateFormatRegex(e.target.value));
+                    setDateEditMode(false);
+                  }}
+                  inputProps={{
+                    style: { fontSize: 12 },
+                  }}
+                />
               ) : (
                 <ListItemText
                   primary="Due Date"
-                  secondary={date.toLocaleDateString()}
+                  secondary={date}
                   primaryTypographyProps={{ variant: "body2" }}
                   secondaryTypographyProps={{ variant: "caption" }}
                 />

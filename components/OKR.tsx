@@ -22,6 +22,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import DateIcon from "@material-ui/icons/DateRange";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
@@ -142,7 +143,9 @@ export default function OKR(props: OKRProps) {
               alignItems="center"
               justifyContent="flex-start"
             >
-              <ObjectiveIcon className={classes.OIcon} />
+              <Tooltip title="Objective">
+                <ObjectiveIcon className={classes.OIcon} />
+              </Tooltip>
               <Typography noWrap className={classes.objTitle}>
                 {data.obj_name}
               </Typography>
@@ -150,13 +153,17 @@ export default function OKR(props: OKRProps) {
           </Grid>
           <Grid item xs={2}>
             <Box display="flex" alignItems="center" justifyContent="flex-end">
-              <Chip
-                icon={<DateIcon style={{ fontSize: 24, marginTop: 2 }} />}
-                label={
-                  !data.target_date ? "----" : dateFormatRegex(data.target_date)
-                }
-                className={classes.dateChip}
-              />
+              <Tooltip title="Target date">
+                <Chip
+                  icon={<DateIcon style={{ fontSize: 24, marginTop: 2 }} />}
+                  label={
+                    !data.target_date
+                      ? "----"
+                      : dateFormatRegex(data.target_date)
+                  }
+                  className={classes.dateChip}
+                />
+              </Tooltip>
             </Box>
           </Grid>
           <Grid item xs={1}>
@@ -185,7 +192,9 @@ export default function OKR(props: OKRProps) {
                   alignItems="center"
                   justifyContent="flex-start"
                 >
-                  <KeyResutIcon className={classes.KRIcon} />
+                  <Tooltip title="Key Result">
+                    <KeyResutIcon className={classes.KRIcon} />
+                  </Tooltip>
                   <Typography variant="body2" noWrap>
                     {keyResult.key_name}
                   </Typography>
@@ -198,22 +207,26 @@ export default function OKR(props: OKRProps) {
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <Typography variant="body2" noWrap>
-                    {progress(
-                      keyResult.progress,
-                      keyResult.max_progress,
-                      keyResult.type
-                    )}
-                  </Typography>
-                  <Chip
-                    icon={<DateIcon style={{ fontSize: 18, marginTop: 4 }} />}
-                    label={
-                      !keyResult.target_date
-                        ? "----"
-                        : dateFormatRegex(keyResult.target_date)
-                    }
-                    className={classes.dateChip}
-                  />
+                  <Tooltip title="Progress">
+                    <Typography variant="body2" noWrap>
+                      {progress(
+                        keyResult.progress,
+                        keyResult.max_progress,
+                        keyResult.type
+                      )}
+                    </Typography>
+                  </Tooltip>
+                  <Tooltip title="Target date">
+                    <Chip
+                      icon={<DateIcon style={{ fontSize: 18, marginTop: 4 }} />}
+                      label={
+                        !keyResult.target_date
+                          ? "----"
+                          : dateFormatRegex(keyResult.target_date)
+                      }
+                      className={classes.dateChip}
+                    />
+                  </Tooltip>
                 </Box>
               </Grid>
               <Grid item xs={1}>

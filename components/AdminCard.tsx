@@ -12,13 +12,13 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import LinkIcon from "@material-ui/icons/LaunchRounded";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CreatorIcon from "@material-ui/icons/OfflineBolt";
 import AdminIcon from "@material-ui/icons/CheckCircle";
 import Profile from "./Profile";
-import { supabase } from "../supabase";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,15 +105,17 @@ export default function AdminCard(props: AdminCardProps): React.ReactElement {
           <strong>{full_name}</strong>
         </Typography>
         <Profile userName={username}>
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            endIcon={<LinkIcon />}
-            className={classes.usernameBtn}
-          >
-            {username}
-          </Button>
+          <Tooltip title="show profile">
+            <Button
+              variant="contained"
+              color="secondary"
+              fullWidth
+              endIcon={<LinkIcon />}
+              className={classes.usernameBtn}
+            >
+              {username}
+            </Button>
+          </Tooltip>
         </Profile>
       </Paper>
     </Grid>

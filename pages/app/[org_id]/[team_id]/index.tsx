@@ -12,8 +12,9 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
 
-import SettingsIcon from "@material-ui/icons/SettingsApplications";
+import SettingsIcon from "@material-ui/icons/Settings";
 import Image from "@/components/Image";
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -68,8 +69,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      margin: theme.spacing(3, 4, 2),
-      paddingBottom: theme.spacing(2),
+      padding: theme.spacing(3, 4, 2),
+      marginBottom: "24px",
       borderBottom: `2px solid ${theme.palette.divider}`,
     },
     title: {
@@ -112,14 +113,19 @@ function TeamIndex(props: TeamIndexProps) {
           {teams.team_name}
         </Typography>
         <Link href={`/app/${teams.oid}/${teams.tid}/settings`}>
-          <IconButton>
-            <SettingsIcon />
-          </IconButton>
+          <Tooltip title="Team Settings">
+            <IconButton style={{ marginTop: "16px" }}>
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
         </Link>
       </div>
       {teams.objectives.length === 0 || !teams.objectives ? (
         <div style={{ marginTop: "48px" }}>
-          <Image src="/nookr.svg" height={360} width={360} />
+          <Image src="/nookr.svg" height={340} width={360} />
+          <Typography variant="h5" align="center">
+            No Objectives
+          </Typography>
         </div>
       ) : (
         teams.objectives.map((okrData) => (

@@ -30,6 +30,7 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import AddIcon from "@material-ui/icons/Add";
 import CancelIcon from "@material-ui/icons/Cancel";
@@ -294,8 +295,12 @@ function TeamsPage(props: TeamsPageProps) {
                       </form>
                     ) : (
                       <>
-                        <AddIcon style={{ fontSize: 52 }} />
-                        ADD TEAM
+                        <Tooltip title="Click to Add">
+                          <div style={{ textAlign: "center" }}>
+                            <AddIcon style={{ fontSize: 52 }} />
+                            <BoxTypography>ADD TEAM</BoxTypography>
+                          </div>
+                        </Tooltip>
                       </>
                     )}
                   </Paper>

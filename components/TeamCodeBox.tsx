@@ -5,6 +5,7 @@ import Container from "@material-ui/core/Container";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Box from "@material-ui/core/Box";
 import { BoxProps } from "@material-ui/core/Box";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import CopyIcon from "@material-ui/icons/FileCopy";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
@@ -58,7 +59,9 @@ function TeamCodeBox(props: TeamCodeBoxProps) {
               {copied ? (
                 <DoneAllIcon style={{ fontSize: 12, color: "green" }} />
               ) : (
-                <CopyIcon style={{ fontSize: 12 }} />
+                <Tooltip title="click to copy">
+                  <CopyIcon style={{ fontSize: 12 }} />
+                </Tooltip>
               )}
             </div>
           </CopyToClipboard>

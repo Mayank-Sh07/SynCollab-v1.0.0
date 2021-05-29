@@ -34,6 +34,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
@@ -158,7 +159,7 @@ function TeamSettings(props: TeamSettingsProps) {
   const { data: team, mutate } = useSWR(propTeams.tid, fetcher, {
     initialData: propTeams,
   });
-  if (!team) {
+  if (!team || !team.source) {
     return <Loader isLocal={false} />;
   }
   const { control, handleSubmit } = useForm();
@@ -425,19 +426,21 @@ function TeamSettings(props: TeamSettingsProps) {
           <Alert
             severity="warning"
             action={
-              <Button
-                startIcon={<LeaveIcon />}
-                color="inherit"
-                onClick={() => {
-                  handleDelete(user.id);
-                  router.push({
-                    pathname: "/app/[org_id]/teams",
-                    query: { org_id: team.oid },
-                  });
-                }}
-              >
-                LEAVE
-              </Button>
+              <Tooltip title="Leave Team">
+                <Button
+                  startIcon={<LeaveIcon />}
+                  color="inherit"
+                  onClick={() => {
+                    handleDelete(user.id);
+                    router.push({
+                      pathname: "/app/[org_id]/teams",
+                      query: { org_id: team.oid },
+                    });
+                  }}
+                >
+                  LEAVE
+                </Button>
+              </Tooltip>
             }
           >
             <AlertTitle>Leave this Team</AlertTitle>
@@ -454,13 +457,15 @@ function TeamSettings(props: TeamSettingsProps) {
             <Alert
               severity="error"
               action={
-                <Button
-                  startIcon={<DeleteIcon />}
-                  color="inherit"
-                  onClick={handleClickOpen}
-                >
-                  DELETE
-                </Button>
+                <Tooltip title="Delete Team">
+                  <Button
+                    startIcon={<DeleteIcon />}
+                    color="inherit"
+                    onClick={handleClickOpen}
+                  >
+                    DELETE
+                  </Button>
+                </Tooltip>
               }
             >
               <AlertTitle>Danger Zone!</AlertTitle>

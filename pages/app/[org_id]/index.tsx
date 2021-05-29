@@ -40,6 +40,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -129,7 +130,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1, 2),
       minWidth: 180,
       maxWidth: 200,
-      border: `1px dashed ${theme.palette.primary.main}`,
+      border: `2px dashed ${theme.palette.primary.main}`,
       height: 250,
     },
   })
@@ -174,7 +175,7 @@ function About(props: OrgIndexPageProps) {
       console.log(err);
       alert("Unable to add Admin.");
     } else {
-      let { data, error } = await supabase.rpc("add_admin", {
+      let { error } = await supabase.rpc("add_admin", {
         org_id: OrgData.oid,
         user_id: profiles[0].uid,
       });
@@ -329,6 +330,7 @@ function About(props: OrgIndexPageProps) {
                             fullWidth
                             type="submit"
                             color="secondary"
+                            variant="outlined"
                             startIcon={<AddIcon />}
                             style={{ margin: "12px auto" }}
                           >
@@ -362,13 +364,15 @@ function About(props: OrgIndexPageProps) {
             <Alert
               severity="error"
               action={
-                <Button
-                  startIcon={<DeleteIcon />}
-                  color="inherit"
-                  onClick={handleClickOpen}
-                >
-                  DELETE
-                </Button>
+                <Tooltip title="Delete Organization">
+                  <Button
+                    startIcon={<DeleteIcon />}
+                    color="inherit"
+                    onClick={handleClickOpen}
+                  >
+                    DELETE
+                  </Button>
+                </Tooltip>
               }
             >
               <AlertTitle>Danger Zone!</AlertTitle>
@@ -413,13 +417,15 @@ function About(props: OrgIndexPageProps) {
             <Alert
               severity="error"
               action={
-                <Button
-                  startIcon={<DeleteIcon />}
-                  color="inherit"
-                  onClick={handleClickOpen}
-                >
-                  Leave
-                </Button>
+                <Tooltip title="Leave Organization">
+                  <Button
+                    startIcon={<DeleteIcon />}
+                    color="inherit"
+                    onClick={handleClickOpen}
+                  >
+                    Leave
+                  </Button>
+                </Tooltip>
               }
             >
               <AlertTitle>Leave Organization</AlertTitle>

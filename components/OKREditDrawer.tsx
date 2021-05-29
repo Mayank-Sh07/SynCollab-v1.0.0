@@ -1,9 +1,7 @@
 import React from "react";
 import clsx from "clsx";
-import DateFnsUtils from "@date-io/date-fns";
 import { supabase } from "@/supabase/index";
 import { KeyResults } from "@/types/local";
-import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import { useForm, Controller } from "react-hook-form";
 import {
   createStyles,
@@ -25,10 +23,12 @@ import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import Chip from "@material-ui/core/Chip";
 import Badge from "@material-ui/core/Badge";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import EditIcon from "@material-ui/icons/Edit";
 import UpdateIcon from "@material-ui/icons/RateReview";
 import CloseIcon from "@material-ui/icons/Close";
+import CheckIcon from "@material-ui/icons/Check";
 import ObjectiveIcon from "@material-ui/icons/TrackChanges";
 import KeyResutIcon from "@material-ui/icons/AssistantPhoto";
 import DateIcon from "@material-ui/icons/DateRange";
@@ -145,12 +145,9 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
   const [DescEditMode, setDescEditMode] = React.useState(false);
   const [description, setDescription] = React.useState(props.key_desc);
   const [DateEditMode, setDateEditMode] = React.useState(false);
-  const [date, setDate] = React.useState(() => {
-    if (!props.target_date) {
-      return new Date();
-    }
-    return new Date(props.target_date);
-  });
+  const [date, setDate] = React.useState(
+    !props.target_date ? new Date().toISOString() : props.target_date
+  );
   const { control, handleSubmit, getValues } = useForm();
 
   const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -168,7 +165,7 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
   const getStatusChip = (tar: KeyResults["target_date"]) => {
     if (tar === undefined) {
       return <></>;
-    } else if (date.getTime() >= new Date().getTime()) {
+    } else if (new Date(date).getTime() >= new Date().getTime()) {
       return (
         <Chip variant="outlined" label="Status: Due" className={classes.due} />
       );
@@ -217,7 +214,7 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
       const { error } = await supabase
         .from<KeyResults>("key_results")
         .update({
-          target_date: edits.date.toLocaleDateString(),
+          target_date: edits.date,
           key_desc: edits.newDescription,
           type: edits.type,
           progress: edits.currProgress,
@@ -238,9 +235,13 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
     <>
       <IconButton size="small" onClick={toggleDrawer}>
         {props.editable ? (
-          <EditIcon style={{ fontSize: 16 }} />
+          <Tooltip title="Edit">
+            <EditIcon style={{ fontSize: 16 }} />
+          </Tooltip>
         ) : (
-          <UpdateIcon style={{ fontSize: 16 }} />
+          <Tooltip title="Update Progress">
+            <UpdateIcon style={{ fontSize: 16 }} />
+          </Tooltip>
         )}
       </IconButton>
       <Drawer
@@ -263,7 +264,7 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
               variant="caption"
               noWrap
               color="textSecondary"
-              style={{ fontWeight: 600 }}
+              style={{ fontWeight: 600, maxWidth: 400 }}
             >
               {props.objective}
             </Typography>
@@ -296,9 +297,13 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                     }}
                     badgeContent={
                       DateEditMode ? (
-                        <CloseIcon className={classes.dateEditBadge} />
+                        <Tooltip title="Cancel Changes">
+                          <CloseIcon className={classes.dateEditBadge} />
+                        </Tooltip>
                       ) : (
-                        <EditIcon className={classes.dateEditBadge} />
+                        <Tooltip title="Edit Date">
+                          <EditIcon className={classes.dateEditBadge} />
+                        </Tooltip>
                       )
                     }
                     onClick={() => {
@@ -320,24 +325,22 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                 )}
               </ListItemAvatar>
               {DateEditMode ? (
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <DatePicker
-                    label="new date"
-                    value={date}
-                    variant="inline"
-                    size="small"
-                    autoOk
-                    invalidDateMessage={""}
-                    onChange={(date) => {
-                      !!date && setDate(new Date(date.toLocaleString()));
-                    }}
-                    onAccept={() => setDateEditMode(false)}
-                  />
-                </MuiPickersUtilsProvider>
+                <TextField
+                  name="newDate"
+                  type="date"
+                  size="small"
+                  onChange={(e) => {
+                    setDate(dateFormatRegex(e.target.value));
+                    setDateEditMode(false);
+                  }}
+                  inputProps={{
+                    style: { fontSize: 12 },
+                  }}
+                />
               ) : (
                 <ListItemText
                   primary="Due Date"
-                  secondary={date.toLocaleDateString()}
+                  secondary={date}
                   primaryTypographyProps={{ variant: "body2" }}
                   secondaryTypographyProps={{ variant: "caption" }}
                 />
@@ -390,18 +393,22 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
               <div style={{ flexGrow: 1 }} />
               <div hidden={!props.editable}>
                 {DescEditMode ? (
-                  <CloseIcon
-                    className={classes.labelIcon}
-                    onClick={() => {
-                      setDescription(getValues("newDescription"));
-                      setDescEditMode(!DescEditMode);
-                    }}
-                  />
+                  <Tooltip title="Save Changes">
+                    <CheckIcon
+                      className={classes.labelIcon}
+                      onClick={() => {
+                        setDescription(getValues("newDescription"));
+                        setDescEditMode(!DescEditMode);
+                      }}
+                    />
+                  </Tooltip>
                 ) : (
-                  <EditIcon
-                    className={classes.labelIcon}
-                    onClick={() => setDescEditMode(!DescEditMode)}
-                  />
+                  <Tooltip title="Edit Description">
+                    <EditIcon
+                      className={classes.labelIcon}
+                      onClick={() => setDescEditMode(!DescEditMode)}
+                    />
+                  </Tooltip>
                 )}
               </div>
             </Box>
@@ -410,11 +417,6 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                 name="newDescription"
                 control={control}
                 defaultValue={description}
-                rules={
-                  {
-                    //   required: "Description required",
-                  }
-                }
                 render={({
                   field: { onChange, value },
                   fieldState: { error },
@@ -498,11 +500,6 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                   name="currProgress"
                   control={control}
                   defaultValue={props.progress}
-                  rules={
-                    {
-                      //   required: "Description required",
-                    }
-                  }
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
@@ -527,11 +524,6 @@ export default function OKREditDrawer(props: OKREditDrawerProps) {
                   name="maxProgress"
                   control={control}
                   defaultValue={props.max_progress}
-                  rules={
-                    {
-                      //   required: "Description required",
-                    }
-                  }
                   render={({
                     field: { onChange, value },
                     fieldState: { error },

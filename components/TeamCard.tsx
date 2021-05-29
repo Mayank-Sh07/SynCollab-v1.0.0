@@ -11,6 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Divider from "@material-ui/core/Divider";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import AddIcon from "@material-ui/icons/AddBox";
 import LinkIcon from "@material-ui/icons/Launch";
@@ -141,9 +142,11 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
               </Grid>
               <Grid item xs={2}>
                 <Link href={baseOrgURL + props.tid + "/" + "settings"}>
-                  <IconButton className={classes.addBtn} size="small">
-                    <SettingsIcon style={{ fontSize: 22 }} />
-                  </IconButton>
+                  <Tooltip title="Team Settings">
+                    <IconButton className={classes.addBtn} size="small">
+                      <SettingsIcon style={{ fontSize: 22 }} />
+                    </IconButton>
+                  </Tooltip>
                 </Link>
               </Grid>
             </>

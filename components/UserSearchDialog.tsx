@@ -20,6 +20,7 @@ import StepLabel from "@material-ui/core/StepLabel";
 import IconButton from "@material-ui/core/IconButton";
 import Avatar from "@material-ui/core/Avatar";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import AddUsersIcon from "@material-ui/icons/GroupAdd";
 import CloseIcon from "@material-ui/icons/Close";
@@ -205,25 +206,27 @@ export default function UserSearchDialog(props: UserSearchDialogProps) {
 
   return (
     <div>
-      {Boolean(props.fullButton) ? (
-        <Button
-          color="secondary"
-          fullWidth
-          variant="outlined"
-          startIcon={<AddUsersIcon />}
-          onClick={handleClickOpen}
-        >
-          Add
-        </Button>
-      ) : (
-        <Button
-          className={classes.addBtn}
-          startIcon={<AddUsersIcon style={{ fontSize: 22 }} />}
-          onClick={handleClickOpen}
-        >
-          Add
-        </Button>
-      )}
+      <Tooltip title="Add Members">
+        {Boolean(props.fullButton) ? (
+          <Button
+            color="secondary"
+            fullWidth
+            variant="outlined"
+            startIcon={<AddUsersIcon />}
+            onClick={handleClickOpen}
+          >
+            Add
+          </Button>
+        ) : (
+          <Button
+            className={classes.addBtn}
+            startIcon={<AddUsersIcon style={{ fontSize: 22 }} />}
+            onClick={handleClickOpen}
+          >
+            Add
+          </Button>
+        )}
+      </Tooltip>
       <Dialog
         fullScreen={fullScreen}
         open={open}
