@@ -20,9 +20,18 @@ import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import NameIcon from "@material-ui/icons/PersonPin";
 import UsernameIcon from "@material-ui/icons/AlternateEmail";
+import Image from "@/components/Image";
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   let { data: profiles } = await supabase.from("profiles").select("username");
+  const { user } = await supabase.auth.api.getUserByCookie(req);
+
+  if (user) {
+    return {
+      props: {},
+      redirect: { destination: "/app", permanent: false },
+    };
+  }
 
   const userNames: string[] =
     profiles === null ? [""] : profiles?.map((profile) => profile.username);
@@ -108,7 +117,7 @@ export default function WelcomePage(props: Props) {
 
   return (
     <Container className={classes.container} maxWidth="sm">
-      <Paper className={classes.paper} elevation={2}>
+      <Paper className={classes.paper} elevation={4}>
         <Typography
           variant="h3"
           className={clsx(classes.pageTitle, classes.centered)}
@@ -116,6 +125,7 @@ export default function WelcomePage(props: Props) {
         >
           Welcome
         </Typography>
+        <Image src="/welcome.svg" height={300} width={300} />
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Paper

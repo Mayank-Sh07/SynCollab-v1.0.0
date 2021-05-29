@@ -22,9 +22,9 @@ import Tooltip from "@material-ui/core/Tooltip";
 
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
 import OrganizationsIcon from "@material-ui/icons/DynamicFeed";
-import AllTeamsIcon from "@material-ui/icons/Category";
-import DnsRoundedIcon from "@material-ui/icons/DnsRounded";
-import AboutIcon from "@material-ui/icons/EmojiObjects";
+import AllTeamsIcon from "@material-ui/icons/Apps";
+import TeamIcon from "@material-ui/icons/SubdirectoryArrowRight";
+import AboutIcon from "@material-ui/icons/BubbleChart";
 import PublishIcon from "@material-ui/icons/Publish";
 
 const styles = (theme: Theme) =>
@@ -63,7 +63,7 @@ const styles = (theme: Theme) =>
     },
     itemIcon: {
       minWidth: "auto",
-      marginRight: theme.spacing(2),
+      marginRight: theme.spacing(1),
     },
     divider: {
       marginTop: theme.spacing(2),
@@ -85,13 +85,13 @@ function Navigator(props: NavigatorProps) {
   let userTeams: Nav[] = !!data
     ? data.map((team) => ({
         id: team.name,
-        icon: <DnsRoundedIcon />,
+        icon: <TeamIcon style={{ fontSize: 26 }} />,
         href: baseOrgURL + encodeURIComponent(team.id),
       }))
     : [
         {
           id: "No Teams",
-          icon: <DnsRoundedIcon />,
+          icon: <TeamIcon />,
           href: baseOrgURL,
         },
       ];
@@ -99,10 +99,14 @@ function Navigator(props: NavigatorProps) {
     {
       id: orgName,
       children: [
-        { id: "About", icon: <AboutIcon />, href: baseOrgURL },
         {
-          id: "All Teams",
-          icon: <AllTeamsIcon />,
+          id: "About",
+          icon: <AboutIcon style={{ fontSize: 26 }} />,
+          href: baseOrgURL,
+        },
+        {
+          id: "Teams",
+          icon: <AllTeamsIcon style={{ fontSize: 24 }} />,
           href: baseOrgURL + "teams",
         },
       ],
@@ -135,7 +139,7 @@ function Navigator(props: NavigatorProps) {
         <Link href="/app">
           <ListItem className={clsx(classes.item, classes.itemCategory)}>
             <ListItemIcon className={classes.itemIcon}>
-              <OrganizationsIcon />
+              <OrganizationsIcon style={{ fontSize: 27 }} />
             </ListItemIcon>
             <ListItemText
               classes={{

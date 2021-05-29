@@ -53,25 +53,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     )
     .eq("oid", orgId);
 
-  const { data: orgmanagersArray } = await supabase
+  const { data: managers } = await supabase
     .from("organizations")
     .select("managers")
     .eq("oid", orgId);
 
-  if (error || !orgmanagersArray) {
+  if (error || !managers) {
     console.log(error?.message);
     return {
       props: {},
-      redirect: { destination: "/auth/login", permanent: false },
+      redirect: { destination: `/app/${orgId}`, permanent: false },
     };
   }
   let fetchError: boolean = Boolean(error);
 
-  let isManager = orgmanagersArray[0].managers.includes(user.id);
+  let isManager = managers[0].managers.includes(user.id);
 
   const UserTeams = await getNavData(orgId, user.id);
 
-  return { props: { Teams, UserTeams, orgId, user, isManager, fetchError } };
+  return {
+    props: { Teams, UserTeams, orgId, user, isManager, fetchError },
+  };
 };
 
 const useStyles = makeStyles((theme: Theme) =>

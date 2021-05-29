@@ -115,7 +115,7 @@ export default function SignUpPage() {
     message: "",
   });
   const { control, handleSubmit, watch, reset } = useForm({
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: { email: "", password: "", confPassword: "" },
   });
   const password = useRef({});
@@ -157,7 +157,7 @@ export default function SignUpPage() {
           <Grid item xs={12} sm={6}>
             <Paper className={classes.paper} elevation={0}>
               {cards.map((card) => (
-                <Card className={classes.card} elevation={0} id={card.title}>
+                <Card className={classes.card} elevation={0} key={card.title}>
                   <CardHeader
                     avatar={
                       <Avatar className={classes.avatar}>{card.icon}</Avatar>

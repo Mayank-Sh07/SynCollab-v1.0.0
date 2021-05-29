@@ -150,7 +150,6 @@ export interface NotificationUpdate
 export interface TeamsData extends Teams, TeamOKRData {
   organizations: {
     creator_id: string;
-    managers: string[];
   };
   source: {
     role: string;
@@ -168,6 +167,7 @@ export interface TeamsPageProps {
   user: User;
   isManager: boolean;
   fetchError: boolean;
+  managers: string[];
 }
 
 export interface SectionTitleProps

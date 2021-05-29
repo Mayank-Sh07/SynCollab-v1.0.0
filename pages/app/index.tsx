@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       position: "relative",
-      alignItems: "center",
+      alignItems: "start",
     },
     actionCard: {
       border: `1px solid ${theme.palette.secondary.light}`,

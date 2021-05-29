@@ -49,6 +49,7 @@ interface SourceProfile extends Source {
 
 interface TeamSettingData extends Teams {
   source: SourceProfile[];
+  organizations: { creator_id: string };
 }
 
 interface TeamSettingsProps {
@@ -74,12 +75,15 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   let { data: teams, error } = await supabase
     .from<TeamSettingData>("teams")
-    .select(`*,source(*,profiles(*))`)
+    .select(`*,organizations:oid(creator_id),source(*,profiles(*))`)
     .eq("tid", teamId);
 
   if (error || !teams || teams?.length === 0) {
     console.log(error?.message);
-    return { props: {} };
+    return {
+      props: {},
+      redirect: { destination: "app/" + org_id, permanent: false },
+    };
   }
   let { count: teamCount } = await supabase
     .from<Teams>("teams")
@@ -92,9 +96,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     .select("role")
     .match({ uid: user.id, tid: teamId });
   let role: Source["role"] = "Observer";
-  if (!roleFetchError && !!source) {
-    role = source.length === 0 ? "Observer" : source[0].role;
+  if (!source || source.length === 0) {
+    return {
+      props: {},
+      redirect: { destination: `/app/${org_id}`, permanent: false },
+    };
   }
+  role = source[0].role;
 
   return { props: { teams: teams[0], user, allowDelete, role } };
 };
@@ -135,7 +143,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const fetcher = async (tid: string) => {
   let { data: teams, error } = await supabase
     .from<TeamSettingData>("teams")
-    .select(`*,source(*,profiles(*))`)
+    .select(`*,organizations:oid(creator_id),source(*,profiles(*))`)
     .eq("tid", tid);
 
   if (error || !teams || teams?.length === 0) {
@@ -151,23 +159,15 @@ function TeamSettings(props: TeamSettingsProps) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [renameMode, setRenameMode] = React.useState(false);
-  const [renamedTitle, setRenamedTitle] = React.useState(props.teams.team_name);
   const { teams: propTeams, user } = props;
-  if (!propTeams) {
-    return <Loader isLocal={false} />;
-  }
+  const { control, handleSubmit } = useForm();
   const { data: team, mutate } = useSWR(propTeams.tid, fetcher, {
     initialData: propTeams,
   });
-  if (!team || !team.source) {
-    return <Loader isLocal={false} />;
-  }
-  const { control, handleSubmit } = useForm();
-
   const [selectedUsers, setSelectedUsers] = React.useState<
     SelectedUserRecords[] | undefined
   >(
-    team.source.map((item) => ({
+    team?.source.map((item) => ({
       ...item.profiles,
       role: item.role,
     }))
@@ -176,6 +176,14 @@ function TeamSettings(props: TeamSettingsProps) {
   const [changesMade, setChanges] = React.useState<
     (SelectedUserRecords | undefined)[]
   >([]);
+
+  if (!propTeams) {
+    return <Loader isLocal={false} />;
+  }
+
+  if (!team || !team.source) {
+    return <Loader isLocal={false} />;
+  }
 
   React.useEffect(() => {
     const existingData: SelectedUserRecords[] = team.source.map((item) => ({
@@ -289,7 +297,7 @@ function TeamSettings(props: TeamSettingsProps) {
               <Controller
                 name="newTitle"
                 control={control}
-                defaultValue={renamedTitle}
+                defaultValue={props.teams.team_name}
                 rules={{
                   required: "New name required",
                   minLength: 3,
@@ -431,11 +439,21 @@ function TeamSettings(props: TeamSettingsProps) {
                   startIcon={<LeaveIcon />}
                   color="inherit"
                   onClick={() => {
-                    handleDelete(user.id);
-                    router.push({
-                      pathname: "/app/[org_id]/teams",
-                      query: { org_id: team.oid },
-                    });
+                    if (
+                      props.teams.organizations.creator_id === user.id &&
+                      !props.allowDelete
+                    ) {
+                      alert(
+                        "Organization creator cannot leave the last team of the Organization!"
+                      );
+                    } else {
+                      handleDelete(user.id);
+                      router.reload();
+                      // router.push({
+                      //   pathname: "/app/[org_id]/teams",
+                      //   query: { org_id: team.oid },
+                      // });
+                    }
                   }}
                 >
                   LEAVE

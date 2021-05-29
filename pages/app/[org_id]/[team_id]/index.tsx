@@ -46,7 +46,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
   if (error || !teams || teams?.length === 0) {
     console.log(error?.message);
-    return { props: {} };
+    return {
+      props: {},
+      redirect: { destination: `/app/${org_id}`, permanent: false },
+    };
   }
   return { props: { teams: teams[0], role, user } };
 };
@@ -102,7 +105,7 @@ function TeamIndex(props: TeamIndexProps) {
   const { data: teams, mutate } = useSWR(propTeams.tid, fetcher, {
     initialData: propTeams,
   });
-  if (!teams) {
+  if (!teams || !teams.objectives) {
     return <Loader isLocal={false} />;
   }
 

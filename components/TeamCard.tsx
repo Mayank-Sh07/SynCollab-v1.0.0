@@ -69,7 +69,9 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
     ]);
 
     if (isErr) {
-      console.log("Error while requesting to join team");
+      alert("User already Notified!");
+    } else {
+      console.log(`Request to join ${props.team_name} sent successfully!`);
     }
   };
 
@@ -83,19 +85,25 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
         <TeamCodeBox code={props.tid} boxProps={{ margin: "-8px 0px 16px" }} />
         <Grid container justify="space-evenly">
           <Grid item container direction="column" xs={2} alignItems="center">
-            <UsersIcon />
+            <Tooltip title="Team Members">
+              <UsersIcon />
+            </Tooltip>
             <BoxTypography variant="caption" mt={0} mb={2}>
               {props.source.length}
             </BoxTypography>
           </Grid>
           <Grid item container direction="column" xs={2} alignItems="center">
-            <ObjectivesIcon />
+            <Tooltip title="Objectives">
+              <ObjectivesIcon />
+            </Tooltip>
             <BoxTypography variant="caption" mt={0} mb={2}>
               {props.objectives.length}
             </BoxTypography>
           </Grid>
           <Grid item container direction="column" xs={2} alignItems="center">
-            <ResultsIcon />
+            <Tooltip title="Key Results">
+              <ResultsIcon />
+            </Tooltip>
             <BoxTypography variant="caption" mt={0} mb={2}>
               {!props.objectives || props.objectives.length === 0
                 ? "0"
