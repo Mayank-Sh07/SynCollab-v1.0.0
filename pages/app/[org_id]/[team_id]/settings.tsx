@@ -185,11 +185,17 @@ function TeamSettings(props: TeamSettingsProps) {
     return <Loader isLocal={false} />;
   }
 
+  if (team.source.length === 0) {
+    return <Loader isLocal={false} />;
+  }
+
   React.useEffect(() => {
-    const existingData: SelectedUserRecords[] = team.source.map((item) => ({
-      ...item.profiles,
-      role: item.role,
-    }));
+    const existingData: SelectedUserRecords[] | undefined = team.source?.map(
+      (item) => ({
+        ...item.profiles,
+        role: item.role,
+      })
+    );
     let changes: (SelectedUserRecords | undefined)[] = [];
     if (!!selectedUsers) {
       changes = selectedUsers.map((user) => {
@@ -224,6 +230,12 @@ function TeamSettings(props: TeamSettingsProps) {
   };
 
   const handleDelete = async (userId: string) => {
+    if (userId === user.id) {
+      alert(
+        "Cannot delete yourself! Consider leaving the team through the Alert below."
+      );
+      return;
+    }
     const { error } = await supabase
       .from<Source>("source")
       .delete()

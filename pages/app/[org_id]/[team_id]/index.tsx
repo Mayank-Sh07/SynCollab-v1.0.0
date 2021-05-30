@@ -125,7 +125,7 @@ function TeamIndex(props: TeamIndexProps) {
       </div>
       {teams.objectives.length === 0 || !teams.objectives ? (
         <div style={{ marginTop: "48px" }}>
-          <Image src="/nookr.svg" height={340} width={360} />
+          <Image src="/organizations.svg" height={340} width={360} />
           <Typography variant="h5" align="center">
             No Objectives
           </Typography>
