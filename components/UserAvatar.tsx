@@ -1,6 +1,7 @@
 import React from "react";
+import useSWR from "swr";
 import { supabase } from "../supabase";
-import { definitions } from "@/types/local";
+import { Profiles } from "@/types/local";
 import { useRouter } from "next/router";
 import { useUser } from "@/supabase/authentication";
 import {
@@ -41,17 +42,30 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+async function fetcher(uid: string) {
+  const userId = uid.replace("_profile", "");
+  const { data } = await supabase
+    .from<Profiles>("profiles")
+    .select("*")
+    .eq("uid", userId);
+
+  if (!data) {
+    return undefined;
+  }
+
+  return data[0];
+}
+
 export default function UserAvatar() {
   const classes = useStyles();
   const router = useRouter();
-  const { user } = useUser();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  let userProfile: definitions["profiles"] | undefined = undefined;
-  if (typeof window !== "undefined") {
-    //@ts-expect-error
-    userProfile = JSON.parse(localStorage.getItem("userProfile"));
-  }
+  const { user } = useUser();
+  const { data: userProfile } = useSWR(
+    !!user ? user.id + "_profile" : null,
+    fetcher
+  );
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);

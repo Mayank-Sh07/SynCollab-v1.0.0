@@ -1,6 +1,8 @@
 import React from "react";
-import { supabase } from "@/supabase/index";
-import { Objectives, Profiles, Source, TeamIndexProps } from "@/types/local";
+import useSWR from "swr";
+import { supabase } from "../supabase";
+import { useUser } from "@/supabase/authentication";
+import { Objectives, Profiles } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Fab from "@material-ui/core/Fab";
@@ -39,10 +41,29 @@ interface AddOKRDialogProps {
   mutate: any;
 }
 
+async function fetcher(uid: string) {
+  const userId = uid.replace("_profile", "");
+  const { data } = await supabase
+    .from<Profiles>("profiles")
+    .select("*")
+    .eq("uid", userId);
+
+  if (!data) {
+    return undefined;
+  }
+
+  return data[0];
+}
+
 export default function AddOKRDialog(props: AddOKRDialogProps) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const { control, handleSubmit, reset } = useForm();
+  const { user } = useUser();
+  const { data: userProfile } = useSWR(
+    !!user ? user.id + "_profile" : null,
+    fetcher
+  );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -54,11 +75,6 @@ export default function AddOKRDialog(props: AddOKRDialogProps) {
   };
 
   const handleAdd = async (data: any) => {
-    let userProfile: Profiles | undefined = undefined;
-    if (typeof window !== "undefined") {
-      //@ts-expect-error
-      userProfile = JSON.parse(localStorage.getItem("userProfile"));
-    }
     const { error } = await supabase.from<Objectives>("objectives").insert([
       {
         team_id: props.teamId,

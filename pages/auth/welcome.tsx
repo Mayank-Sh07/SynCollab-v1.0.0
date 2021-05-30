@@ -108,7 +108,8 @@ export default function WelcomePage(props: Props) {
       return;
     }
     setStatus({ open: true, success: true });
-    router.push("/app");
+    supabase.auth.signOut();
+    router.push("/auth/login");
   };
 
   if (user === undefined) {

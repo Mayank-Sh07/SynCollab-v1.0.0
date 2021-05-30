@@ -1,5 +1,7 @@
 import React from "react";
+import useSWR from "swr";
 import { supabase } from "../supabase";
+import { useUser } from "@/supabase/authentication";
 import { KeyResults, NewOKR, OKRProps, Profiles } from "@/types/local";
 import { useForm, Controller } from "react-hook-form";
 import { dateFormatRegex } from "@/utils/functions";
@@ -67,17 +69,31 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+async function fetcher(uid: string) {
+  const userId = uid.replace("_profile", "");
+  const { data } = await supabase
+    .from<Profiles>("profiles")
+    .select("*")
+    .eq("uid", userId);
+
+  if (!data) {
+    return undefined;
+  }
+
+  return data[0];
+}
+
 export default function OKR(props: OKRProps) {
   const classes = useStyles();
   const { data, userRole, teamName } = props;
   const { key_results, ...objcetive } = data;
   const [addClicked, setAddClicked] = React.useState(false);
   const { control, handleSubmit, reset } = useForm();
-  let userProfile: Profiles | undefined = undefined;
-  if (typeof window !== "undefined") {
-    //@ts-expect-error
-    userProfile = JSON.parse(localStorage.getItem("userProfile"));
-  }
+  const { user } = useUser();
+  const { data: userProfile } = useSWR(
+    !!user ? user.id + "_profile" : null,
+    fetcher
+  );
 
   const progress = (
     curr: KeyResults["progress"],
@@ -101,11 +117,6 @@ export default function OKR(props: OKRProps) {
   };
 
   const addNewKeyResult = async (data: NewOKR) => {
-    let userProfile: Profiles | undefined = undefined;
-    if (typeof window !== "undefined") {
-      //@ts-expect-error
-      userProfile = JSON.parse(localStorage.getItem("userProfile"));
-    }
     const { error } = await supabase.from<KeyResults>("key_results").insert([
       {
         key_name: data.keyName,
