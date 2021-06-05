@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   let { data: Teams, error } = await supabase
     .from<TeamsData>("teams")
     .select(
-      `*,organizations:oid(creator_id),source(role),objectives(obj_id,key_results(key_id))`
+      `*,organizations:oid(creator_id),source(role,uid),objectives(obj_id,key_results(key_id))`
     )
     .eq("oid", orgId);
 
@@ -83,6 +83,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "flex-end",
     },
     mainPaper: {
+      backgroundColor: "transparent",
       padding: theme.spacing(2),
       [theme.breakpoints.only("xs")]: {
         display: "flex",
@@ -122,7 +123,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(3),
       minWidth: 275,
       maxWidth: 300,
-      height: 305,
+      height: 290,
       border: `2px dashed ${theme.palette.secondary.main}`,
     },
   })
@@ -133,7 +134,7 @@ const fetcher = async (orgId: string) => {
   let { data: Teams } = await supabase
     .from<TeamsData>("teams")
     .select(
-      `*,organizations:oid(creator_id),source(role),objectives(obj_id,key_results(key_id))`
+      `*,organizations:oid(creator_id),source(role,uid),objectives(obj_id,key_results(key_id))`
     )
     .eq("oid", oid);
 
@@ -153,7 +154,6 @@ function TeamsPage(props: TeamsPageProps) {
       initialData: props.UserTeams,
     }
   );
-  console.log(Teams);
   const { control, handleSubmit, reset } = useForm();
   const [open, setOpen] = React.useState(false);
   const userTeamIdArray = UserTeams?.map((team) => team.id);
@@ -218,7 +218,6 @@ function TeamsPage(props: TeamsPageProps) {
                   isUserTeam={Boolean(userTeamIdArray?.includes(team.tid))}
                   orgId={orgId}
                   user={user}
-                  isManager={isManager}
                 />
               ))}
               {isManager && (

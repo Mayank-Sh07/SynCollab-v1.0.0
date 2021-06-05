@@ -6,7 +6,7 @@ let SyncollabTheme = createMuiTheme({
     type: "dark",
     primary: {
       light: "#25282c",
-      main: "#232f3e",
+      main: "#1a232e ",
       dark: "#151719",
     },
     secondary: {

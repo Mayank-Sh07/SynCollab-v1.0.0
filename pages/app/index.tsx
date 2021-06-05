@@ -78,10 +78,12 @@ const useStyles = makeStyles((theme: Theme) =>
     pageTitle: {
       fontWeight: 800,
       textAlign: "center",
+      marginTop: theme.spacing(6),
     },
     gridContainer: {
       marginTop: theme.spacing(4),
       marginBottom: theme.spacing(2),
+      backgroundColor: "transparent",
     },
     card: {
       minWidth: 275,
@@ -256,7 +258,11 @@ function AppIndex(props: AppIndexProps) {
 
   return (
     <Container maxWidth={"md"} className={classes.container}>
-      <Paper elevation={0} className={classes.paper}>
+      <Paper
+        elevation={0}
+        className={classes.paper}
+        style={{ backgroundColor: "transparent" }}
+      >
         <Typography variant="h3" className={classes.pageTitle} gutterBottom>
           Organizations
         </Typography>
@@ -287,7 +293,7 @@ function AppIndex(props: AppIndexProps) {
                       <strong>{org.date}</strong>
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {truncate(org.about, 75, "...")}
+                      {truncate(org.about, 180, "...")}
                     </Typography>
                   </CardContent>
                   <CardActions>
@@ -318,7 +324,11 @@ function AppIndex(props: AppIndexProps) {
           </Grid>
         )}
       </Paper>
-      <Paper elevation={0} className={classes.paper}>
+      <Paper
+        elevation={0}
+        className={classes.paper}
+        style={{ backgroundColor: "transparent" }}
+      >
         <Grid
           container
           spacing={4}

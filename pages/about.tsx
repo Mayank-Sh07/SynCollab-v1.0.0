@@ -17,7 +17,6 @@ import Grid from "@material-ui/core/Grid";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      backgroundColor: theme.palette.primary.dark,
       minHeight: "100vh",
     },
     secondaryColor: {
@@ -39,7 +38,7 @@ function About() {
 
   return (
     <div className={classes.root}>
-      <Image src="/about.svg" height={460} width={500} />
+      <Image src="/team_work.svg" height={460} width={500} />
       <BoxTypography {...title1}>
         Get to know
         <strong className={classes.secondaryColor}> SynCollab</strong>

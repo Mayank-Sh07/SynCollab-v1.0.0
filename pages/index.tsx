@@ -21,7 +21,6 @@ import GithubIcon from "@material-ui/icons/GitHub";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      backgroundColor: theme.palette.primary.dark,
       minHeight: "100vh",
     },
     secondaryColor: {

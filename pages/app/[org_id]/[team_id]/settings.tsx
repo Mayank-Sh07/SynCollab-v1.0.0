@@ -166,12 +166,12 @@ function TeamSettings(props: TeamSettingsProps) {
   });
   const [selectedUsers, setSelectedUsers] = React.useState<
     SelectedUserRecords[] | undefined
-  >(
-    team?.source.map((item) => ({
+  >(() => {
+    return team?.source?.map((item) => ({
       ...item.profiles,
       role: item.role,
-    }))
-  );
+    }));
+  });
 
   const [changesMade, setChanges] = React.useState<
     (SelectedUserRecords | undefined)[]
@@ -248,6 +248,21 @@ function TeamSettings(props: TeamSettingsProps) {
       setSelectedUsers((prev) => prev?.filter((user) => user.uid !== userId));
     }
   };
+
+  const handleLeave = async (userId: string) => {
+    const { error } = await supabase
+      .from<Source>("source")
+      .delete()
+      .match({ uid: userId, tid: team.tid });
+
+    if (error) {
+      alert(error.message);
+    } else {
+      mutate();
+      setSelectedUsers((prev) => prev?.filter((user) => user.uid !== userId));
+    }
+  };
+
   const handleTeamDelete = async () => {
     const { error } = await supabase.from("teams").delete().eq("tid", team.tid);
 
@@ -347,12 +362,14 @@ function TeamSettings(props: TeamSettingsProps) {
               <BoxTypography {...title1} mb={4}>
                 {team.team_name}
               </BoxTypography>
-              <IconButton
-                onClick={() => setRenameMode(true)}
-                style={{ marginLeft: "12px" }}
-              >
-                <EditIcon />
-              </IconButton>
+              {props.role === "Manager" && (
+                <IconButton
+                  onClick={() => setRenameMode(true)}
+                  style={{ marginLeft: "12px" }}
+                >
+                  <EditIcon />
+                </IconButton>
+              )}
             </>
           )}
         </div>
@@ -459,12 +476,8 @@ function TeamSettings(props: TeamSettingsProps) {
                         "Organization creator cannot leave the last team of the Organization!"
                       );
                     } else {
-                      handleDelete(user.id);
+                      handleLeave(user.id);
                       router.reload();
-                      // router.push({
-                      //   pathname: "/app/[org_id]/teams",
-                      //   query: { org_id: team.oid },
-                      // });
                     }
                   }}
                 >

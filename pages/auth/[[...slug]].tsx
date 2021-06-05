@@ -23,10 +23,12 @@ import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 
-import AccountTree from "@material-ui/icons/AccountTree";
 import EmailIcon from "@material-ui/icons/Email";
 import PasswordIcon from "@material-ui/icons/VpnKey";
 import BackIcon from "@material-ui/icons/KeyboardBackspaceRounded";
+import OfflineBoltIcon from "@material-ui/icons/OfflineBolt";
+import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
+import GavelIcon from "@material-ui/icons/Gavel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -84,25 +86,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const cards = [
   {
-    icon: <AccountTree />,
-    title: "Card One",
-    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-  Similique quidem eius, quam aliquid optio sed labore natus
-  quisquam maiores placeat`,
+    icon: <OfflineBoltIcon />,
+    title: "Get Signed Up!",
+    description: `Create an account in a jiffy by filling up all the necessary information in the form shown, just check the box and click signup, It's that simple!`,
   },
   {
-    icon: <AccountTree />,
-    title: "Card Two",
-    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-  Similique quidem eius, quam aliquid optio sed labore natus
-  quisquam maiores placeat`,
+    icon: <VerifiedUserIcon />,
+    title: "Verify Your E-mail",
+    description: `Upon signing up sucessfully a prompt will alert you to verify your entered signup e-mail address. Close the current tab and click the verification link in the sent mail to start using SynCollab. 
+    `,
   },
   {
-    icon: <AccountTree />,
-    title: "Card Three",
-    description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-  Similique quidem eius, quam aliquid optio sed labore natus
-  quisquam maiores placeat`,
+    icon: <GavelIcon />,
+    title: "Terms & Conditions",
+    description: `By clicking Sign Up, you agree to our Terms, 
+    Data Policy and Cookie Policy. 
+    You may receive email notifications from us 
+    and can opt-out at any time.`,
   },
 ];
 

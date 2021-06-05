@@ -12,6 +12,7 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Divider from "@material-ui/core/Divider";
 import Tooltip from "@material-ui/core/Tooltip";
+import Chip from "@material-ui/core/Chip";
 
 import AddIcon from "@material-ui/icons/AddBox";
 import LinkIcon from "@material-ui/icons/Launch";
@@ -48,6 +49,10 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: "4px",
       padding: "4px",
     },
+    chip: {
+      borderRadius: "3px",
+      fontSize: "14px",
+    },
   })
 );
 
@@ -73,6 +78,60 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
     } else {
       console.log(`Request to join ${props.team_name} sent successfully!`);
     }
+  };
+
+  const showQuickAccess = () => {
+    if (props.isUserTeam) {
+      const userRoleData = props.source.filter(
+        (user) => user.uid === props.user.id
+      );
+      const userRole = userRoleData[0].role;
+      if (userRole === "Manager") {
+        return (
+          <Grid container justify="space-evenly" alignItems="center">
+            <Grid item xs={4}>
+              <Chip
+                variant="default"
+                size="small"
+                label={userRole}
+                className={classes.chip}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <UserSearchDialog
+                orgId={props.oid}
+                teamId={props.tid}
+                uid={props.user.id}
+                teamName={props.team_name}
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <Link href={baseOrgURL + props.tid + "/" + "settings"}>
+                <Tooltip title="Team Settings">
+                  <IconButton className={classes.addBtn} size="small">
+                    <SettingsIcon style={{ fontSize: 22 }} />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+            </Grid>
+          </Grid>
+        );
+      } else {
+        return (
+          <Grid container alignItems="center" justify="space-evenly">
+            <Grid item xs={12}>
+              <Chip
+                variant="default"
+                size="small"
+                label={userRole}
+                className={classes.chip}
+              />
+            </Grid>
+          </Grid>
+        );
+      }
+    }
+    return <></>;
   };
 
   return (
@@ -136,30 +195,8 @@ export default function TeamCard(props: TeamsData): React.ReactElement {
           </Button>
         )}
         <Divider className={classes.divider} />
-        <Grid container justify="space-evenly" alignItems="center">
-          <Grid item xs={4}></Grid>
-          {props.isManager && (
-            <>
-              <Grid item xs={4}>
-                <UserSearchDialog
-                  orgId={props.oid}
-                  teamId={props.tid}
-                  uid={props.user.id}
-                  teamName={props.team_name}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <Link href={baseOrgURL + props.tid + "/" + "settings"}>
-                  <Tooltip title="Team Settings">
-                    <IconButton className={classes.addBtn} size="small">
-                      <SettingsIcon style={{ fontSize: 22 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Link>
-              </Grid>
-            </>
-          )}
-        </Grid>
+
+        {showQuickAccess()}
       </Paper>
     </Grid>
   );

@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flex: 1,
       padding: theme.spacing(5, 2),
       background: theme.palette.primary.dark,
+      backgroundImage: `url("https://www.transparenttextures.com/patterns/black-linen.png")`,
     },
   })
 );

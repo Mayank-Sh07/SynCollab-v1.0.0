@@ -39,18 +39,35 @@ const UserAvatar = dynamic(() => import("@/components/UserAvatar"), {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundImage: `url("https://www.transparenttextures.com/patterns/stardust.png")`,
+      paddingBottom: theme.spacing(8),
+      background: "inherit",
+      [theme.breakpoints.only("xs")]: {
+        paddingBottom: theme.spacing(4),
+      },
+    },
+    page: {
+      backgroundColor: "transparent",
       minHeight: "100vh",
     },
     appBar: {
       backgroundColor: theme.palette.primary.dark,
       paddingBottom: theme.spacing(1),
+      WebkitBoxShadow: "0 2px 4px -3px black",
+      boxShadow: "0 2px 4px -3px black",
     },
     toolBar: {
       minHeight: 64,
       paddingTop: theme.spacing(2),
       [theme.breakpoints.only("xs")]: {
         paddingRight: 0,
+      },
+    },
+    logoLabel: {
+      fontWeight: 700,
+      marginLeft: "12px",
+      [theme.breakpoints.only("xs")]: {
+        display: "none",
       },
     },
     menuButton: {
@@ -71,10 +88,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     footer: {
       marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(8),
-      [theme.breakpoints.only("xs")]: {
-        marginBottom: theme.spacing(4),
-      },
     },
     footerTitle: {
       fontWeight: 700,
@@ -129,117 +142,126 @@ export default function PageLayout(props: LayoutProps) {
   return (
     <React.Fragment>
       <CssBaseline />
-      {/* Header */}
-      <HideOnScroll {...props}>
-        <AppBar className={classes.appBar} elevation={0}>
-          <Container>
-            <Toolbar className={classes.toolBar}>
-              <Image src="/logo.svg" height={50} width={50} />
-              <div className={classes.spacer} />
-              <Hidden smUp>
-                <Link href="/">
-                  <IconButton className={classes.menuButton} size="small">
-                    <HomeIcon />
-                  </IconButton>
+      <Container maxWidth={false} disableGutters className={classes.root}>
+        {/* Header */}
+        <HideOnScroll {...props}>
+          <AppBar className={classes.appBar} elevation={0}>
+            <Container>
+              <Toolbar className={classes.toolBar}>
+                <Image src="/logo.svg" height={42} width={42} />
+                <Typography variant="h4" className={classes.logoLabel}>
+                  SynCollab
+                </Typography>
+                <div className={classes.spacer} />
+                <Hidden smUp>
+                  <Link href="/">
+                    <IconButton className={classes.menuButton} size="small">
+                      <HomeIcon />
+                    </IconButton>
+                  </Link>
+                  <Link href="/about">
+                    <IconButton className={classes.menuButton} size="small">
+                      <AboutIcon />
+                    </IconButton>
+                  </Link>
+                  <Link href="/pricing">
+                    <IconButton className={classes.menuButton} size="small">
+                      <PricingIcon />
+                    </IconButton>
+                  </Link>
+                </Hidden>
+                <Hidden xsDown>
+                  <Tabs
+                    value={path}
+                    onChange={handleChange}
+                    className={classes.tabSection}
+                  >
+                    <Tab
+                      label="Home"
+                      classes={{ root: classes.tab }}
+                      value="/"
+                    />
+                    <Tab
+                      label="About"
+                      classes={{ root: classes.tab }}
+                      value="/about"
+                    />
+                    <Tab
+                      label="Pricing"
+                      classes={{ root: classes.tab }}
+                      value="/pricing"
+                    />
+                  </Tabs>
+                </Hidden>
+                {!!user && <NotificationModal userId={user?.id} />}
+                <UserAvatar />
+              </Toolbar>
+            </Container>
+          </AppBar>
+        </HideOnScroll>
+        <Toolbar className={classes.toolBar} />
+        <Container maxWidth={"md"} component="main" className={classes.page}>
+          {props.children}
+        </Container>
+        <Container maxWidth="md" component="footer" className={classes.footer}>
+          <Grid container justify="space-between">
+            <Grid item>
+              <Box display="flex">
+                <Image src="/logo.svg" height={36} width={36} />
+                <Typography variant="h6" className={classes.footerTitle}>
+                  SynCollab
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item style={{ alignSelf: "flex-end" }}>
+              <IconButton size={"small"} className={classes.footerItem}>
+                <LinkedIn />
+              </IconButton>
+              <IconButton size={"small"} className={classes.footerItem}>
+                <Instagram />
+              </IconButton>
+            </Grid>
+          </Grid>
+          <Grid container className={classes.copyrightContainer}>
+            <Grid item>
+              <Typography variant="caption" color="textSecondary">
+                Made by{" "}
+                <Link color="secondary" href="#">
+                  {" Team 5 "}
                 </Link>
-                <Link href="/about">
-                  <IconButton className={classes.menuButton} size="small">
-                    <AboutIcon />
-                  </IconButton>
-                </Link>
-                <Link href="/pricing">
-                  <IconButton className={classes.menuButton} size="small">
-                    <PricingIcon />
-                  </IconButton>
-                </Link>
-              </Hidden>
-              <Hidden xsDown>
-                <Tabs
-                  value={path}
-                  onChange={handleChange}
-                  className={classes.tabSection}
-                >
-                  <Tab label="Home" classes={{ root: classes.tab }} value="/" />
-                  <Tab
-                    label="About"
-                    classes={{ root: classes.tab }}
-                    value="/about"
-                  />
-                  <Tab
-                    label="Pricing"
-                    classes={{ root: classes.tab }}
-                    value="/pricing"
-                  />
-                </Tabs>
-              </Hidden>
-              {!!user && <NotificationModal userId={user?.id} />}
-              <UserAvatar />
-            </Toolbar>
-          </Container>
-        </AppBar>
-      </HideOnScroll>
-      <Toolbar className={classes.toolBar} />
-      <Container maxWidth={"md"} component="main" className={classes.root}>
-        {props.children}
-      </Container>
-      <Container maxWidth="md" component="footer" className={classes.footer}>
-        <Grid container justify="space-between">
-          <Grid item>
-            <Box display="flex">
-              <Image src="/logo.svg" height={36} width={36} />
-              <Typography variant="h6" className={classes.footerTitle}>
-                SynCollab
+                All Rights Reserved.
               </Typography>
-            </Box>
+            </Grid>
+            <Grid item>
+              <Typography variant="caption" color="textSecondary">
+                <Link
+                  href="/"
+                  color="textSecondary"
+                  className={classes.footerItem}
+                >
+                  {"Home"}
+                </Link>
+                <Link
+                  href="/about"
+                  color="textSecondary"
+                  className={classes.footerItem}
+                >
+                  {"About"}
+                </Link>
+                <Link
+                  href="/pricing"
+                  color="textSecondary"
+                  className={classes.footerItem}
+                >
+                  {"Pricing"}
+                </Link>
+                <Link href="/app" color="textSecondary">
+                  {"Application"}
+                </Link>
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item style={{ alignSelf: "flex-end" }}>
-            <IconButton size={"small"} className={classes.footerItem}>
-              <LinkedIn />
-            </IconButton>
-            <IconButton size={"small"} className={classes.footerItem}>
-              <Instagram />
-            </IconButton>
-          </Grid>
-        </Grid>
-        <Grid container className={classes.copyrightContainer}>
-          <Grid item>
-            <Typography variant="caption" color="textSecondary">
-              Made by{" "}
-              <Link color="secondary" href="#">
-                {" Mayank. "}
-              </Link>
-              All Rights Reserved.
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="caption" color="textSecondary">
-              <Link
-                href="/"
-                color="textSecondary"
-                className={classes.footerItem}
-              >
-                {"Home"}
-              </Link>
-              <Link
-                href="/about"
-                color="textSecondary"
-                className={classes.footerItem}
-              >
-                {"About"}
-              </Link>
-              <Link
-                href="/pricing"
-                color="textSecondary"
-                className={classes.footerItem}
-              >
-                {"Pricing"}
-              </Link>
-              <Link href="/app" color="textSecondary">
-                {"Application"}
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
+        </Container>
       </Container>
     </React.Fragment>
   );

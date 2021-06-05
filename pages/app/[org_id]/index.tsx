@@ -98,6 +98,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     mainPaper: {
+      backgroundColor: "transparent",
       padding: theme.spacing(2),
       [theme.breakpoints.only("xs")]: {
         display: "flex",
@@ -250,7 +251,7 @@ function About(props: OrgIndexPageProps) {
           <div>
             <BoxTypography {...title1}>{OrgData.org_name}</BoxTypography>
             <BoxTypography
-              maxWidth={880}
+              maxWidth={800}
               margin={"auto"}
               {...subtitle1}
               className={classes.textJustify}
@@ -261,7 +262,20 @@ function About(props: OrgIndexPageProps) {
             </BoxTypography>
           </div>
           <div>
-            <BoxTypography {...title2}>Administrators</BoxTypography>
+            <BoxTypography {...title2} mt={8}>
+              Administrators
+            </BoxTypography>
+            <BoxTypography
+              maxWidth={800}
+              mb={6}
+              margin={"auto"}
+              {...subtitle1}
+              className={classes.textJustify}
+            >
+              {
+                "The Organization administrators hold the responsibility of creating collaborative teams within the Organization. Only the Creator and Organization administrators have the permissions to create a new team within the `Teams` section of the Organization. All the administrators along with the organization creator are shown below"
+              }
+            </BoxTypography>
             <Container maxWidth={"md"} className={classes.adminCardContainer}>
               <Grid container justify="space-evenly" spacing={4}>
                 {!!AdminProfiles ? (
@@ -349,7 +363,20 @@ function About(props: OrgIndexPageProps) {
             </Container>
           </div>
           <div>
-            <BoxTypography {...title2}>Member Info</BoxTypography>
+            <BoxTypography {...title2} mt={8}>
+              Collaborator Data
+            </BoxTypography>
+            <BoxTypography
+              maxWidth={800}
+              mb={6}
+              margin={"auto"}
+              {...subtitle1}
+              className={classes.textJustify}
+            >
+              {"The below data grid provides information on all the members of " +
+                OrgData.org_name +
+                ". You can conveniently view the name, username, the team of the collaborator as well as their role and when they had been added to that particular team. The data grid offers strong filtering and viewing features for faster and more precise insights."}
+            </BoxTypography>
             <Table
               rows={rows}
               columns={columns}

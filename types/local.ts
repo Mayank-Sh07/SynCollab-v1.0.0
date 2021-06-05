@@ -153,6 +153,7 @@ export interface TeamsData extends Teams, TeamOKRData {
   };
   source: {
     role: string;
+    uid: string;
   }[];
   isUserTeam: boolean;
   orgId: number;
