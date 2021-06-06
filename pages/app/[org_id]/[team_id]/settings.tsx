@@ -425,34 +425,30 @@ function TeamSettings(props: TeamSettingsProps) {
             <strong style={{ color: "white", fontSize: "24px" }}>
               {"Manager "}
             </strong>
-            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
-            suscipit est blanditiis dolore magni a voluptate exercitationem!
-            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
-            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
-            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
-            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+            {`is the most superior role within any Team. The manager has the 
+            permissions to add new OKRs, edit all existing OKRs and can also 
+            use the user management section above to alter and assign roles to 
+            the collabortors within the team.`}
           </BoxTypography>
           <BoxTypography {...subtitle1} align="justify">
             <strong style={{ color: "white", fontSize: "24px" }}>
               {"Member "}
             </strong>
-            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
-            suscipit est blanditiis dolore magni a voluptate exercitationem!
-            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
-            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
-            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
-            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+            {`is the role assigned to team members who are primarily contributors,
+             This role grants permissions for adding key reults to existing objectives
+              and also allows the member to complety edit their own key results. 
+              However, members cannot completly alter key results created by fellow 
+              members or managers, rather they can only update the progress If they've 
+              made any.`}
           </BoxTypography>
           <BoxTypography {...subtitle1} align="justify">
             <strong style={{ color: "white", fontSize: "24px" }}>
               {"Observer "}
             </strong>
-            {`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
-            suscipit est blanditiis dolore magni a voluptate exercitationem!
-            Tempora ea repellat dolorum consectetur, laborum deserunt rerum
-            delectus sapiente quo ex dignissimos magnam excepturi dolore aut
-            inventore quisquam? Voluptatum ut, consequuntur a sit, perferendis
-            nostrum, officia eaque nulla saepe quia repudiandae? Officiis?`}
+            {`is a simple role which allows the collaborator to merely observe 
+            the progress within the team. Observers cannot add or update any 
+            objective or key results. Their purpose is to keep track of how the 
+            team is proceeding towards acheiving its goals.`}
           </BoxTypography>
         </Paper>
         <Container

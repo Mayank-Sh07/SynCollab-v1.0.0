@@ -116,6 +116,38 @@ export default function OKR(props: OKRProps) {
     setAddClicked(!addClicked);
   };
 
+  const KeyResutIconStatus = (data: KeyResults) => {
+    if (!!data.progress && !!data.max_progress && !!data.target_date) {
+      if (data.progress >= data.max_progress)
+        return (
+          <Tooltip title="Completed Key Result">
+            <KeyResutIcon
+              className={classes.KRIcon}
+              style={{ color: "lightgreen" }}
+            />
+          </Tooltip>
+        );
+      else if (new Date(data.target_date).getTime() >= new Date().getTime()) {
+        return (
+          <Tooltip title="Completed Key Result">
+            <KeyResutIcon
+              className={classes.KRIcon}
+              style={{ color: "lightblue" }}
+            />
+          </Tooltip>
+        );
+      } else
+        return (
+          <Tooltip title="Completed Key Result">
+            <KeyResutIcon className={classes.KRIcon} style={{ color: "red" }} />
+          </Tooltip>
+        );
+    } else {
+      <Tooltip title="Completed Key Result">
+        <KeyResutIcon className={classes.KRIcon} />
+      </Tooltip>;
+    }
+  };
   const addNewKeyResult = async (data: NewOKR) => {
     const { error } = await supabase.from<KeyResults>("key_results").insert([
       {
@@ -203,9 +235,7 @@ export default function OKR(props: OKRProps) {
                   alignItems="center"
                   justifyContent="flex-start"
                 >
-                  <Tooltip title="Key Result">
-                    <KeyResutIcon className={classes.KRIcon} />
-                  </Tooltip>
+                  {KeyResutIconStatus(keyResult)}
                   <Typography variant="body2" noWrap>
                     {keyResult.key_name}
                   </Typography>
